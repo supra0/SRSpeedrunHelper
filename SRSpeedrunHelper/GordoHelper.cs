@@ -49,6 +49,8 @@ namespace SRSpeedrunHelper
         };
         #endregion
 
+        private static readonly FieldInfo targetCountField = typeof(GordoModel).GetField("targetCount", BindingFlags.Instance | BindingFlags.NonPublic);
+
         #region Helper Methods
         public static void ResetGordo(string gordoId)
         {
@@ -71,7 +73,18 @@ namespace SRSpeedrunHelper
             }
         }
 
-        
+        public static string GetGordoStatus(string gordoId)
+        {
+            GordoModel gordoModel = SRSingleton<SceneContext>.Instance.GameModel.GetGordoModel(gordoId);
+            if(gordoModel.gordoEatenCount == -1)
+            {
+                return "Status: Popped";
+            }
+            else
+            {
+                return "Status: Fed " + gordoModel.gordoEatenCount + "/" + (int)targetCountField.GetValue(gordoModel);
+            }
+        }
         #endregion
     }
 }

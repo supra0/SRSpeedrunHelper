@@ -1,5 +1,5 @@
 IMPORTANT INFO:
-- Press the tilde key (`) while in-game to open or close the Speedrun Helper Menu.
+- Press the tilde key (`) while in-game to open or close the Speedrun Helper Menu. You must pause the game in order to use the menu.
 - Additional hotkeys can be configured in the UMF settings (Shift+F10).
 - The menu can be dragged for repositioning.
 - For now it is highly recommended that you use the SRCheatMenu mod alongside this one. It provides many useful functions such as noclip, inventory editing, and more. In the future, some features from SRCheatMenu may be added to this mod.
@@ -14,7 +14,7 @@ This is an in-progress mod made to help speedrunners practice and route in Slime
 - View detailed info on most slime spawners
 - Extend the length of exported GIFs up to 10 seconds.
 
-For questions and support either ask in #slime-rancher-1 in the Slime Rancher Speedrun Discord server, or DM Supra#7595.
+For questions and support either ask in the Slime Rancher Speedrun Discord server, or DM Supra#7595.
 
 Source code can be found here: https://github.com/supra0/SRSpeedrunHelper
 Created by Supra
