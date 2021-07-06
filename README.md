@@ -3,6 +3,8 @@ This mod aims to help Slime Rancher speedrunners route and practice for Slime Ra
 
 Please note that under the rules of the Slime Rancher speedrunning leaderboard, mods and mod loaders cannot be installed during submitted runs. Please uninstall this mod and UMF before starting a run you intend to submit, or alternatively keep a separate installation of the game for the use of mods.
 
+This video serves as a tutorial/overview of the mod: (link to youtube video)
+
 ## Features
 * Many pre-set warp locations.
 * Custom warp locations with the option to save your inventory (similar to save states).
@@ -19,6 +21,7 @@ To install this mod, follow these steps:
 2. Download and run the [UMF Installer](https://umodframework.com/download).
 3. Once installed, download the [latest release](#) of this mod.
 4. Move SRSpeedrunHelper.umfmod into the uModFramework/Mods folder located in your Slime Rancher installation directory.
+5. Once in-game, press the tilde key (\`) to open the mod's window.
 
 ## Contributing
 To edit and built this project, follow these steps:
