@@ -22,7 +22,7 @@ namespace SRSpeedrunHelper
         private static int currentToolbarTab = 0;
         private static readonly string[] toolbarTabTitles =
         {
-            "Warps",
+            "Save States",
             "Timer",
             "Gordos",
             "Spawner Info",
@@ -39,7 +39,7 @@ namespace SRSpeedrunHelper
         internal static readonly GUIStyle TEXT_STYLE_MOD_WARNING = new GUIStyle();
         #endregion
 
-        #region Warp Variables
+        #region Save State Variables
         public static readonly int WARP_NAME_MAX_LENGTH = 30;
 
         private static Vector2 warpsScrollPosition = Vector2.zero;
@@ -48,14 +48,18 @@ namespace SRSpeedrunHelper
         private static string[] warpsToolbarTabTitles =
         {
             "Presets",
-            "Custom"
+            "Custom",
+            "Create"
         };
 
         private static bool saveAmmoToggle = false;
+        private static bool saveHealthToggle = true;
+        private static bool saveEnergyToggle = true;
+        private static bool saveNewbucksToggle = false;
 
         private List<WarpData> userWarps;
         private bool refreshUserWarpsFlag = true;
-        private string newUserWarpText = "New warp";
+        private string newUserWarpText = "New save state";
         #endregion
 
         #region Game Timer Variables
@@ -78,11 +82,12 @@ namespace SRSpeedrunHelper
         private SpawnerInfoNode targetSpawner;
 
         private bool showSpawners = false;
+
         private bool spawnerShowTriggerRate = true;
-        private bool spawnerConvertToPercentage = false;
         private bool spawnerShowAvgNextSpawn = true;
         private bool spawnerShowNextSpawnTime = true; // TODO: Show the actual next possible spawn time
         private bool spawnerShowCountRange = true;
+        private bool spawnerConvertToPercentage = false;
         #endregion
 
         #region GIF Recorder Variables
@@ -114,22 +119,24 @@ namespace SRSpeedrunHelper
             // Register Keybinds
             UMFGUI.RegisterBind("BindShowMenu", SRSHConfig.bind_showMenu.ToString(), () => showMenu = !showMenu);
 
-            UMFGUI.RegisterBind("BindUserWarp1", SRSHConfig.bind_userWarp1.ToString(), () => WarpPlayer(UserWarps.GetWarpDataByIndex(0)));
-            UMFGUI.RegisterBind("BindUserWarp2", SRSHConfig.bind_userWarp2.ToString(), () => WarpPlayer(UserWarps.GetWarpDataByIndex(1)));
-            UMFGUI.RegisterBind("BindUserWarp3", SRSHConfig.bind_userWarp3.ToString(), () => WarpPlayer(UserWarps.GetWarpDataByIndex(2)));
-            UMFGUI.RegisterBind("BindUserWarp4", SRSHConfig.bind_userWarp4.ToString(), () => WarpPlayer(UserWarps.GetWarpDataByIndex(3)));
-            UMFGUI.RegisterBind("BindUserWarp5", SRSHConfig.bind_userWarp5.ToString(), () => WarpPlayer(UserWarps.GetWarpDataByIndex(4)));
-            UMFGUI.RegisterBind("BindUserWarp6", SRSHConfig.bind_userWarp6.ToString(), () => WarpPlayer(UserWarps.GetWarpDataByIndex(5)));
-            UMFGUI.RegisterBind("BindUserWarp7", SRSHConfig.bind_userWarp7.ToString(), () => WarpPlayer(UserWarps.GetWarpDataByIndex(6)));
-            UMFGUI.RegisterBind("BindUserWarp8", SRSHConfig.bind_userWarp8.ToString(), () => WarpPlayer(UserWarps.GetWarpDataByIndex(7)));
-            UMFGUI.RegisterBind("BindUserWarp9", SRSHConfig.bind_userWarp9.ToString(), () => WarpPlayer(UserWarps.GetWarpDataByIndex(8)));
-            UMFGUI.RegisterBind("BindUserWarp10", SRSHConfig.bind_userWarp10.ToString(), () => WarpPlayer(UserWarps.GetWarpDataByIndex(9)));
-            UMFGUI.RegisterBind("BindUserWarp11", SRSHConfig.bind_userWarp11.ToString(), () => WarpPlayer(UserWarps.GetWarpDataByIndex(10)));
-            UMFGUI.RegisterBind("BindUserWarp12", SRSHConfig.bind_userWarp12.ToString(), () => WarpPlayer(UserWarps.GetWarpDataByIndex(11)));
+            UMFGUI.RegisterBind("BindSavestate1", SRSHConfig.bind_userWarp1.ToString(), () => WarpPlayer(UserWarps.GetWarpDataByIndex(0)));
+            UMFGUI.RegisterBind("BindSavestate2", SRSHConfig.bind_userWarp2.ToString(), () => WarpPlayer(UserWarps.GetWarpDataByIndex(1)));
+            UMFGUI.RegisterBind("BindSavestate3", SRSHConfig.bind_userWarp3.ToString(), () => WarpPlayer(UserWarps.GetWarpDataByIndex(2)));
+            UMFGUI.RegisterBind("BindSavestate4", SRSHConfig.bind_userWarp4.ToString(), () => WarpPlayer(UserWarps.GetWarpDataByIndex(3)));
+            UMFGUI.RegisterBind("BindSavestate5", SRSHConfig.bind_userWarp5.ToString(), () => WarpPlayer(UserWarps.GetWarpDataByIndex(4)));
+            UMFGUI.RegisterBind("BindSavestate6", SRSHConfig.bind_userWarp6.ToString(), () => WarpPlayer(UserWarps.GetWarpDataByIndex(5)));
+            UMFGUI.RegisterBind("BindSavestate7", SRSHConfig.bind_userWarp7.ToString(), () => WarpPlayer(UserWarps.GetWarpDataByIndex(6)));
+            UMFGUI.RegisterBind("BindSavestate8", SRSHConfig.bind_userWarp8.ToString(), () => WarpPlayer(UserWarps.GetWarpDataByIndex(7)));
+            UMFGUI.RegisterBind("BindSavestate9", SRSHConfig.bind_userWarp9.ToString(), () => WarpPlayer(UserWarps.GetWarpDataByIndex(8)));
+            UMFGUI.RegisterBind("BindSavestate10", SRSHConfig.bind_userWarp10.ToString(), () => WarpPlayer(UserWarps.GetWarpDataByIndex(9)));
+            UMFGUI.RegisterBind("BindSavestate11", SRSHConfig.bind_userWarp11.ToString(), () => WarpPlayer(UserWarps.GetWarpDataByIndex(10)));
+            UMFGUI.RegisterBind("BindSavestate12", SRSHConfig.bind_userWarp12.ToString(), () => WarpPlayer(UserWarps.GetWarpDataByIndex(11)));
 
             UMFGUI.RegisterBind("BindStartTimer", SRSHConfig.bind_startTimer.ToString(), StartTimer);
             UMFGUI.RegisterBind("BindStopTimer", SRSHConfig.bind_stopTimer.ToString(), StopTimer);
             UMFGUI.RegisterBind("BindResetTimer", SRSHConfig.bind_resetTimer.ToString(), ResetTimer);
+
+            UMFGUI.RegisterBind("BindSpawnCrate", SRSHConfig.bind_spawnCrate.ToString(), SpawnCrate);
 
             // Initialize GUI Styles
             LABEL_STYLE_DEFAULT.fontSize = 16;
@@ -200,6 +207,12 @@ namespace SRSpeedrunHelper
                     targetSpawner = null;
                 }
             }
+
+            if(Levels.isMainMenu() || Levels.isSpecial())
+            {
+                SpawnerInfoNode.ClearNodes();
+                showSpawners = false;
+            }
         }
         #endregion
 
@@ -265,6 +278,12 @@ namespace SRSpeedrunHelper
                                     if (GUILayout.Button(warp.Name))
                                     {
                                         WarpPlayer(warp);
+
+                                        if(SRSHConfig.saveStateCloseMenu)
+                                        {
+                                            showMenu = false;
+                                            SRSingleton<PauseMenu>.Instance.UnPauseGame();
+                                        }
                                     }
                                 }
                                 GUILayout.EndHorizontal();
@@ -286,9 +305,15 @@ namespace SRSpeedrunHelper
                             {
                                 GUILayout.BeginHorizontal();
                                 GUILayout.Label(warpData.Name, LABEL_STYLE_BOLD);
-                                if (GUILayout.Button("Warp"))
+                                if (GUILayout.Button("Load"))
                                 {
                                     WarpPlayer(warpData);
+
+                                    if (SRSHConfig.saveStateCloseMenu)
+                                    {
+                                        showMenu = false;
+                                        SRSingleton<PauseMenu>.Instance.UnPauseGame();
+                                    }
                                 }
                                 else if (GUILayout.Button("Remove"))
                                 {
@@ -309,10 +334,36 @@ namespace SRSpeedrunHelper
                                 GUILayout.EndHorizontal();
                             }
 
-                            // Add new user warp bar
-                            GUILayout.BeginHorizontal();
+                            GUILayout.EndScrollView();
+                            GUILayout.FlexibleSpace();
+
+                            if (GUILayout.Button("Save save states to disk (Warning: will overwrite any save states currently present in config file)"))
+                            {
+                                UserWarps.WriteToFile();
+                            }
+                            if (GUILayout.Button("Load save states from disk"))
+                            {
+                                UserWarps.LoadFromFile();
+                                RefreshUserWarpList();
+                            }
+                            
+                            break;
+
+                        case (2):
+                            // Create custom warps tab
+                            GUILayout.Label("Save state name", LABEL_STYLE_BOLD);
                             newUserWarpText = GUILayout.TextField(newUserWarpText, WARP_NAME_MAX_LENGTH);
+
+                            GUILayout.Label("\nOptions", LABEL_STYLE_BOLD);
+
                             saveAmmoToggle = GUILayout.Toggle(saveAmmoToggle, "Save Ammo");
+
+                            saveHealthToggle = GUILayout.Toggle(saveHealthToggle, "Save Health");
+                            saveEnergyToggle = GUILayout.Toggle(saveEnergyToggle, "Save Energy");
+                            saveNewbucksToggle = GUILayout.Toggle(saveNewbucksToggle, "Save Newbucks");
+
+                            GUILayout.FlexibleSpace();
+
                             if (GUILayout.Button("Add"))
                             {
                                 InventoryData newInventoryData = null;
@@ -332,26 +383,29 @@ namespace SRSpeedrunHelper
                                 }
 
                                 PlayerModel playerModelTmp = GetPlayerModel();
-                                UserWarps.AddUserWarp(new WarpData(playerModelTmp.GetPos(), playerModelTmp.GetRot().eulerAngles, newUserWarpText, playerModelTmp.currRegionSetId, newInventoryData));
+                                
+                                WarpData warpDataTmp = new WarpData(playerModelTmp.GetPos(), playerModelTmp.GetRot().eulerAngles, newUserWarpText, playerModelTmp.currRegionSetId, newInventoryData);
 
-                                newUserWarpText = "New warp";
+                                if(saveHealthToggle)
+                                {
+                                    warpDataTmp.PlayerHealth = playerModelTmp.currHealth;
+                                }
+                                if(saveEnergyToggle)
+                                {
+                                    warpDataTmp.PlayerEnergy = playerModelTmp.currEnergy;
+                                }
+                                if(saveNewbucksToggle)
+                                {
+                                    warpDataTmp.PlayerNewbucks = playerModelTmp.currency;
+                                }
+
+                                UserWarps.AddUserWarp(warpDataTmp);
+
+                                newUserWarpText = "New save state";
                                 refreshUserWarpsFlag = true;
-                            }
-                            GUILayout.EndHorizontal();
 
-                            GUILayout.EndScrollView();
-                            GUILayout.FlexibleSpace();
-
-                            if (GUILayout.Button("Save warps to disk (Warning: will overwrite any warps currently present in config file)"))
-                            {
-                                UserWarps.WriteToFile();
+                                warpsToolbarTab = 1; // switch to Custom tab to indicate the save state was added and to show it in the list
                             }
-                            if (GUILayout.Button("Load warps from disk"))
-                            {
-                                UserWarps.LoadFromFile();
-                                RefreshUserWarpList();
-                            }
-                            
                             break;
 
                         default:
@@ -427,9 +481,9 @@ namespace SRSpeedrunHelper
                         showSpawners = newShowSpawners;
                     }
 
+                    spawnerConvertToPercentage = GUILayout.Toggle(spawnerConvertToPercentage, "Show probabilities/weights in percentage rather than decimal");
                     spawnerShowCountRange = GUILayout.Toggle(spawnerShowCountRange, "Show minimum and maximum amount of slimes spawned from this spawner");
                     spawnerShowTriggerRate = GUILayout.Toggle(spawnerShowTriggerRate, "Show spawn chance of spawners once triggered");
-                    spawnerConvertToPercentage = GUILayout.Toggle(spawnerConvertToPercentage, "Show spawn chance in percentage rather than decimal");
                     spawnerShowAvgNextSpawn = GUILayout.Toggle(spawnerShowAvgNextSpawn, "Show average amount of time until the next possible spawn after a trigger");
                     //spawnerShowNextSpawnTime = GUILayout.Toggle(spawnerShowNextSpawnTime, "Show the next time this spawner can be triggered"); requires reflection, stored in SpawnerTriggerModel
                     break;
@@ -461,7 +515,13 @@ namespace SRSpeedrunHelper
                         }
                     }
 
-                    GUILayout.Label("Warning: Changing this value will clear the current GIF buffer\n(i.e. the last x seconds of recording will be erased)", LABEL_STYLE_DEFAULT);
+                    GUILayout.Label("Warning: Changing this value will clear the current GIF buffer\n(i.e. the last x seconds of recording will be erased)\n", LABEL_STYLE_DEFAULT);
+
+                    // Spawn a crate in front of the player
+                    if(GUILayout.Button("Spawn crate"))
+                    {
+                        SpawnCrate();
+                    }
 
                     GUILayout.FlexibleSpace();
                     GUILayout.Label("More features to be added here in future versions. Taking requests on Discord!", LABEL_STYLE_BOLD);
@@ -499,6 +559,10 @@ namespace SRSpeedrunHelper
             {
                 return;
             }
+            if(Levels.isMainMenu() || Levels.isSpecial())
+            {
+                return;
+            }
 
             PlayerModel playerModelTmp = GetPlayerModel();
             playerModelTmp.SetTransform(warpData.Position, warpData.RotEuler);
@@ -507,6 +571,21 @@ namespace SRSpeedrunHelper
             if(warpData.HasInventoryData())
             {
                 SetPlayerSlots(warpData.InventoryData);
+            }
+
+            if(warpData.PlayerHealth != null)
+            {
+                playerModelTmp.SetHealth((float)warpData.PlayerHealth);
+                playerModelTmp.healthBurstAfter = SceneContext.Instance.TimeDirector.WorldTime() + 300.0;
+            }
+            if(warpData.PlayerEnergy != null)
+            {
+                playerModelTmp.SetEnergy((float)warpData.PlayerEnergy);
+                playerModelTmp.energyRecoverAfter = SceneContext.Instance.TimeDirector.WorldTime() + 300.0;
+            }
+            if(warpData.PlayerNewbucks != null)
+            {
+                playerModelTmp.SetCurrency((int)warpData.PlayerNewbucks);
             }
         }
 
@@ -604,11 +683,30 @@ namespace SRSpeedrunHelper
                 }
                 text += t + "\n";
 
+                float weightsSum = 0.0f;
+
+                if(spawnerConvertToPercentage)
+                {
+                    foreach(SlimeSet.Member slimeSet in constraint.slimeset.members)
+                    {
+                        weightsSum += slimeSet.weight;
+                    }
+                }
+
                 foreach (SlimeSet.Member slimeSet in constraint.slimeset.members)
                 {
                     string tmp = slimeSet.prefab.ToString();
                     text += tmp.Substring(0, tmp.IndexOf(" "));
-                    text += ": " + slimeSet.weight.ToString() + "\n";
+                    
+                    if(spawnerConvertToPercentage)
+                    {
+                        text += ": " + (slimeSet.weight / weightsSum) * 100 + "%\n";
+                    }
+                    else
+                    {
+                        text += ": " + slimeSet.weight + "\n";
+                    }
+                    
                 }
 
                 text += "\n";
@@ -640,10 +738,27 @@ namespace SRSpeedrunHelper
         }
         #endregion
 
+        #region Misc methods
         PlayerModel GetPlayerModel()
         {
             return SRSingleton<SceneContext>.Instance.GameModel.GetPlayerModel();
         }
 
-	}
+        void SpawnCrate()
+        {
+            if(Levels.isMainMenu() || Levels.isSpecial())
+            {
+                return;
+            }
+
+            Transform playerTransform = SceneContext.Instance.Player.transform;
+            Vector3 cratePos = playerTransform.TransformPoint(Vector3.forward * 5 + new Vector3(0, 1.8f, 0));
+
+            GameObject cratePrefab = GameContext.Instance.LookupDirector.GetPrefab(Identifiable.Id.CRATE_REEF_01);
+            SRBehaviour.InstantiateActor(cratePrefab, GetPlayerModel().currRegionSetId, cratePos, Quaternion.identity);
+        }
+
+        #endregion
+
+    }
 }

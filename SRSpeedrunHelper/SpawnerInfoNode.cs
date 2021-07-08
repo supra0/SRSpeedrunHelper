@@ -67,6 +67,11 @@ namespace SRSpeedrunHelper
             }
         }
 
+        public static void ClearNodes()
+        {
+            allSpawnerInfoNodes = null;
+        }
+
         private static void CreateNodes()
         {
             if(allSpawnerInfoNodes != null)

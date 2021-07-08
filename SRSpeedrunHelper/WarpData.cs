@@ -85,6 +85,10 @@ namespace SRSpeedrunHelper
 
         public InventoryData InventoryData { get; set; }
 
+        public float? PlayerHealth { get; set; } = null;
+        public float? PlayerEnergy { get; set; } = null;
+        public int? PlayerNewbucks { get; set; } = null;
+
         // Need parameterless constructor for serialization
         public WarpData()
         {
