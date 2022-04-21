@@ -3,6 +3,7 @@ using System.Reflection;
 using UnityEngine;
 using UModFramework.API;
 using MonomiPark.SlimeRancher.DataModel;
+using System;
 
 namespace SRSpeedrunHelper
 {
@@ -17,7 +18,7 @@ namespace SRSpeedrunHelper
         private static readonly int windowId = 1258;
 
         private static Rect windowRect = new Rect(Screen.width - windowSizeX, 0, windowSizeX, windowSizeY); // Window dimensions and default position. Appears in top-right corner
-        private static bool showMenu = false;
+        private static bool showMenu = true;
 
         private static int currentToolbarTab = 0;
         private static readonly string[] toolbarTabTitles =
@@ -234,7 +235,7 @@ namespace SRSpeedrunHelper
 
             if (!Levels.isMainMenu() && !Levels.isSpecial())
             {
-                if(showMenu)
+                if(showMenu && IsGamePaused())
                 {
                     windowRect = GUILayout.Window(windowId, windowRect, ShowMenu, windowTitle);
                 }
@@ -758,6 +759,27 @@ namespace SRSpeedrunHelper
             SRBehaviour.InstantiateActor(cratePrefab, GetPlayerModel().currRegionSetId, cratePos, Quaternion.identity);
         }
 
+        // Returns whether or not the game is paused
+        // Logic mostly copied from Pause method, may want to merge some functionality
+        bool IsGamePaused()
+        {
+            TimeDirector timeDirector = null;
+            try
+            {
+                timeDirector = SRSingleton<SceneContext>.Instance.TimeDirector;
+            }
+            catch(Exception e)
+            {
+                Log(e.Message);
+            }
+
+            if(!timeDirector)
+            {
+                return false;
+            }
+
+            return timeDirector.HasPauser();
+        }
         #endregion
 
     }

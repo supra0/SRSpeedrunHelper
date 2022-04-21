@@ -1,11 +1,11 @@
 IMPORTANT INFO:
-- Press the tilde key (`) while in-game to open or close the Speedrun Helper Menu. You must pause the game in order to use the menu.
-- Additional hotkeys can be configured in the UMF settings (Shift+F10). Right now, the game must be restarted in order for hotkey changes to take effect.
+- Press the back quote key (`) while in-game to open or close the Speedrun Helper Menu. You must pause the game in order to use the menu.
+- Additional hotkeys can be configured in the UMF settings (Shift+F10). The game must be restarted in order for hotkey changes to take effect.
 - The menu can be dragged for repositioning.
 - For now it is highly recommended that you use the SRCheatMenu mod alongside this one. It provides many useful functions such as noclip, inventory editing, and more. In the future, some features from SRCheatMenu may be added to this mod.
 - Please don't submit runs with this mod, UMF, or any other mod/mod loader installed. They will be rejected.
 
-Patch notes for the current version (1.1) can be viewed here: https://github.com/supra0/SRSpeedrunHelper/releases
+Patch notes for the current version can be viewed here: https://github.com/supra0/SRSpeedrunHelper/releases
 
 For questions and support either ask in the Slime Rancher Speedrun Discord server, or DM Supra#7595.
 

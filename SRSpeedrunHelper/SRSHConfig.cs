@@ -65,7 +65,7 @@ namespace SRSpeedrunHelper
                     SRSpeedrunHelper.Log("Finished UMF Settings.");
 
                     // Show menu bind(s)
-                    bind_showMenu = cfg.Read("BindShowMenu", new UMFConfigKeyCode(KeyCode.Tilde, true), "Shows the SRSpeedrunHelper menu.");
+                    bind_showMenu = cfg.Read("BindShowMenu", new UMFConfigKeyCode(KeyCode.BackQuote, true), "Shows the SRSpeedrunHelper menu.");
 
                     // User warp binds
                     bind_userWarp1 = cfg.Read("BindSavestate1", new UMFConfigKeyCode(KeyCode.F1, true), "Runs the 1st custom save state.");
