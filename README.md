@@ -3,8 +3,6 @@ This mod aims to help Slime Rancher speedrunners route and practice for Slime Ra
 
 Please note that under the rules of the Slime Rancher speedrunning leaderboard, mods and mod loaders cannot be installed during submitted runs. Please uninstall this mod and UMF before starting a run you intend to submit, or alternatively keep a separate installation of the game for the use of mods.
 
-This video serves as a tutorial/overview of the mod: (link to youtube video)
-
 ## Features
 * Many pre-set warp locations.
 * Custom warp locations with the option to save your inventory (similar to save states).
