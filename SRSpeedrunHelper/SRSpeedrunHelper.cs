@@ -7,7 +7,7 @@ using System;
 
 namespace SRSpeedrunHelper
 {
-    [UMFHarmony(0)] //Set this to the number of harmony patches in your mod.
+    //[UMFHarmony(0)] //Set this to the number of harmony patches in your mod.
     [UMFScript]
     class SRSpeedrunHelper : MonoBehaviour
     {
@@ -100,6 +100,10 @@ namespace SRSpeedrunHelper
         private readonly FieldInfo gifLengthField = typeof(GifRecorder).GetField("GIF_LENGTH", BindingFlags.Static | BindingFlags.NonPublic);
         #endregion
 
+        #region Misc Variables
+        public static bool disableEnergyRecovery = false;
+        #endregion
+
         #region Unity/UMF and Initialization
         internal static void Log(string text, bool clean = false)
         {
@@ -176,8 +180,14 @@ namespace SRSpeedrunHelper
 
         void Update()
         {
+            if(disableEnergyRecovery)
+            {
+                SetEnergyRecoverAfter(double.PositiveInfinity);
+            }
+
             if(showSpawners)
             {
+                // TODO: For efficiency, try hijacking the player's Raycast that's used to identify what Identifiable is being looked at
                 if (Physics.Raycast(Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0.0f)), out rayHit, 40.0f))
                 {
                     SpawnerInfoNode temp = rayHit.collider.GetComponent<SpawnerInfoNode>();
@@ -444,7 +454,7 @@ namespace SRSpeedrunHelper
 
                     GameModel gameModel = SRSingleton<SceneContext>.Instance.GameModel;
 
-                    // Present them in the predefined order defined in GordoHelper.gordoIdsOrdered
+                    // Present them in the order defined in GordoHelper.gordoIdsOrdered
                     // Excludes Party Gordos, Gold Gordos (Rush Mode), and snared Gordos
                     foreach(string gordoId in GordoHelper.gordoIdsOrdered)
                     {
@@ -457,7 +467,12 @@ namespace SRSpeedrunHelper
                         }
 
                         GUILayout.Label(GordoHelper.GetGordoStatus(gordoId), LABEL_STYLE_DEFAULT);
-                        if(GUILayout.Button("Reset Gordo"))
+                        if (GUILayout.Button("Pop Gordo"))
+                        {
+                            GordoHelper.PopGordo(gordoId);
+                        }
+
+                        if (GUILayout.Button("Reset Gordo"))
                         {
                             GordoHelper.ResetGordo(gordoId);
                         }
@@ -489,9 +504,29 @@ namespace SRSpeedrunHelper
                     //spawnerShowNextSpawnTime = GUILayout.Toggle(spawnerShowNextSpawnTime, "Show the next time this spawner can be triggered"); requires reflection, stored in SpawnerTriggerModel
                     break;
 
-                case (4):
+                case (4): // Misc Settings
+                    // Energy settings
+                    GUILayout.Label("Energy Settings", LABEL_STYLE_BOLD);
+
+                    GUILayout.BeginHorizontal();
+                    if (GUILayout.Button("Set Energy to 0"))
+                    {
+                        SetPlayerEnergy(0f);
+                    }
+
+                    if (disableEnergyRecovery != GUILayout.Toggle(disableEnergyRecovery, "Disable Energy recovery"))
+                    {
+                        disableEnergyRecovery = !disableEnergyRecovery;
+                        if (!disableEnergyRecovery)
+                        {
+                            SetEnergyRecoverAfter(SceneContext.Instance.TimeDirector.WorldTime() + 300.0);
+                        }
+                    }
+                    GUILayout.EndHorizontal();
+
+
                     // Gif Recorder settings
-                    GUILayout.Label("GIF Settings", LABEL_STYLE_BOLD);
+                    GUILayout.Label("\nGIF Settings", LABEL_STYLE_BOLD);
                     OptionsDirector optionsDirector = SRSingleton<GameContext>.Instance.OptionsDirector;
 
                     if(gifLengthWasChanged)
@@ -518,8 +553,12 @@ namespace SRSpeedrunHelper
 
                     GUILayout.Label("Warning: Changing this value will clear the current GIF buffer\n(i.e. the last x seconds of recording will be erased)\n", LABEL_STYLE_DEFAULT);
 
+
+
+                    GUILayout.Label("\nOther", LABEL_STYLE_BOLD);
+
                     // Spawn a crate in front of the player
-                    if(GUILayout.Button("Spawn crate"))
+                    if (GUILayout.Button("Spawn crate"))
                     {
                         SpawnCrate();
                     }
@@ -581,8 +620,7 @@ namespace SRSpeedrunHelper
             }
             if(warpData.PlayerEnergy != null)
             {
-                playerModelTmp.SetEnergy((float)warpData.PlayerEnergy);
-                playerModelTmp.energyRecoverAfter = SceneContext.Instance.TimeDirector.WorldTime() + 300.0;
+                SetPlayerEnergy((float)warpData.PlayerEnergy);
             }
             if(warpData.PlayerNewbucks != null)
             {
@@ -597,7 +635,7 @@ namespace SRSpeedrunHelper
                 return;
             }
 
-            PlayerState playerStateTmp = SRSingleton<SceneContext>.Instance.PlayerState;
+            PlayerState playerStateTmp = SceneContext.Instance.PlayerState;
             playerStateTmp.SetAmmoMode(inventoryData.AmmoMode);
 
             playerStateTmp.Ammo.Clear();
@@ -739,10 +777,10 @@ namespace SRSpeedrunHelper
         }
         #endregion
 
-        #region Misc methods
+        #region Misc Methods
         PlayerModel GetPlayerModel()
         {
-            return SRSingleton<SceneContext>.Instance.GameModel.GetPlayerModel();
+            return SceneContext.Instance.GameModel.GetPlayerModel();
         }
 
         void SpawnCrate()
@@ -759,6 +797,25 @@ namespace SRSpeedrunHelper
             SRBehaviour.InstantiateActor(cratePrefab, GetPlayerModel().currRegionSetId, cratePos, Quaternion.identity);
         }
 
+        void SetPlayerEnergy(float energy)
+        {
+            PlayerModel playerModel = GetPlayerModel();
+            playerModel.SetEnergy(energy);
+            if(disableEnergyRecovery)
+            {
+                SetEnergyRecoverAfter(double.PositiveInfinity);
+            }
+            else
+            {
+                SetEnergyRecoverAfter(SceneContext.Instance.TimeDirector.WorldTime() + 300.0);
+            }
+        }
+
+        void SetEnergyRecoverAfter(double time)
+        {
+            GetPlayerModel().energyRecoverAfter = time;
+        }
+
         // Returns whether or not the game is paused
         // Logic mostly copied from Pause method, may want to merge some functionality
         bool IsGamePaused()
@@ -766,7 +823,7 @@ namespace SRSpeedrunHelper
             TimeDirector timeDirector = null;
             try
             {
-                timeDirector = SRSingleton<SceneContext>.Instance.TimeDirector;
+                timeDirector = SceneContext.Instance.TimeDirector;
             }
             catch(Exception e)
             {

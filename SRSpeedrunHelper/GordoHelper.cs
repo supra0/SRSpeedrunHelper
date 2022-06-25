@@ -52,6 +52,23 @@ namespace SRSpeedrunHelper
         private static readonly FieldInfo targetCountField = typeof(GordoModel).GetField("targetCount", BindingFlags.Instance | BindingFlags.NonPublic);
 
         #region Helper Methods
+        public static void PopGordo(string gordoId)
+        {
+            GordoModel gordoModel = SceneContext.Instance.GameModel.GetGordoModel(gordoId);
+            if(gordoModel != null)
+            {
+                gordoModel.gordoEatenCount = (int)targetCountField.GetValue(gordoModel);
+
+                GameObject gameObject = (GameObject)typeof(GordoModel).GetField("gameObj", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(gordoModel);
+                GordoEat gordoEat = gameObject.GetComponent<GordoEat>();
+                if(gordoEat != null)
+                {
+                    MethodInfo immediateReachedTarget = typeof(GordoEat).GetMethod("ImmediateReachedTarget", BindingFlags.Instance | BindingFlags.NonPublic);
+                    immediateReachedTarget.Invoke(gordoEat, null);
+                }
+            }
+        }
+
         public static void ResetGordo(string gordoId)
         {
             GordoModel gordoModel = SRSingleton<SceneContext>.Instance.GameModel.GetGordoModel(gordoId);
