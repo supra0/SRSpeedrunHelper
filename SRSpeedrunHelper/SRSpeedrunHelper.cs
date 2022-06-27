@@ -7,7 +7,7 @@ using System;
 
 namespace SRSpeedrunHelper
 {
-    //[UMFHarmony(0)] //Set this to the number of harmony patches in your mod.
+    [UMFHarmony(1)] //Set this to the number of harmony patches in your mod.
     [UMFScript]
     class SRSpeedrunHelper : MonoBehaviour
     {
@@ -101,7 +101,8 @@ namespace SRSpeedrunHelper
         #endregion
 
         #region Misc Variables
-        public static bool disableEnergyRecovery = false;
+        private bool disableEnergyRecovery = false;
+        public static bool disableFirestorms = false;
         #endregion
 
         #region Unity/UMF and Initialization
@@ -417,6 +418,7 @@ namespace SRSpeedrunHelper
 
                                 warpsToolbarTab = 1; // switch to Custom tab to indicate the save state was added and to show it in the list
                             }
+
                             break;
 
                         default:
@@ -450,6 +452,23 @@ namespace SRSpeedrunHelper
 
                 case (2):
                     // Gordo settings
+                    GUILayout.BeginHorizontal();
+                    if(GUILayout.Button("Pop all Gordos"))
+                    {
+                        foreach(string gordoId in GordoHelper.gordoIdsOrdered)
+                        {
+                            GordoHelper.PopGordo(gordoId);
+                        }
+                    }
+                    if(GUILayout.Button("Reset all Gordos"))
+                    {
+                        foreach (string gordoId in GordoHelper.gordoIdsOrdered)
+                        {
+                            GordoHelper.ResetGordo(gordoId);
+                        }
+                    }
+                    GUILayout.EndHorizontal();
+
                     gordoScrollPosition = GUILayout.BeginScrollView(gordoScrollPosition);
 
                     GameModel gameModel = SRSingleton<SceneContext>.Instance.GameModel;
@@ -535,7 +554,7 @@ namespace SRSpeedrunHelper
                     }
 
                     float currGifLength = (float)gifLengthField.GetValue(null);
-                    GUILayout.Label("GIF Length (seconds): " + currGifLength.ToString("0.##"), LABEL_STYLE_DEFAULT);
+                    GUILayout.Label("GIF Length: " + currGifLength.ToString("0.## sec."), LABEL_STYLE_DEFAULT);
                     float newGifLength = GUILayout.HorizontalSlider(currGifLength, GIF_LENGTH_MIN, GIF_LENGTH_MAX);
                     if (currGifLength != newGifLength)
                     {
@@ -551,11 +570,14 @@ namespace SRSpeedrunHelper
                         }
                     }
 
-                    GUILayout.Label("Warning: Changing this value will clear the current GIF buffer\n(i.e. the last x seconds of recording will be erased)\n", LABEL_STYLE_DEFAULT);
-
-
+                    GUILayout.Label("Warning: Changing this value will clear the current GIF buffer\n(i.e. the last x seconds of recording will be erased)", LABEL_STYLE_DEFAULT);
 
                     GUILayout.Label("\nOther", LABEL_STYLE_BOLD);
+                    if(disableFirestorms != GUILayout.Toggle(disableFirestorms, "Disable Firestorms"))
+                    {
+                        disableFirestorms = !disableFirestorms;
+                        SetFirestormsActive(!disableFirestorms);
+                    }
 
                     // Spawn a crate in front of the player
                     if (GUILayout.Button("Spawn crate"))
@@ -814,6 +836,28 @@ namespace SRSpeedrunHelper
         void SetEnergyRecoverAfter(double time)
         {
             GetPlayerModel().energyRecoverAfter = time;
+        }
+
+        void SetFirestormsActive(bool active)
+        {
+            WorldModel worldModel = SceneContext.Instance.GameModel.GetWorldModel();
+
+            if(active)
+            {
+                // Attempt to restore regular firestorm behavior
+                // Set the same way as in FirestormActivator.MaybeStartFirestorm
+                TimeDirector timeDirector = SceneContext.Instance.TimeDirector;
+                worldModel.nextFirestormTime = timeDirector.HoursFromNow(Randoms.SHARED.GetInRange(8f, 15f));
+            }
+            else
+            {
+                // End firestorm if one is active
+                worldModel.endFirestormTime = worldModel.worldTime;
+                // Ensure the next firestorm will never happen
+                // Also implemented in Patch_FirestormActivator to ensure the setting persists across loads
+                worldModel.nextFirestormTime = double.PositiveInfinity;
+                worldModel.nextFirecolumnTime = double.PositiveInfinity;
+            }
         }
 
         // Returns whether or not the game is paused

@@ -57,6 +57,11 @@ namespace SRSpeedrunHelper
             GordoModel gordoModel = SceneContext.Instance.GameModel.GetGordoModel(gordoId);
             if(gordoModel != null)
             {
+                // Don't pop already popped gordos
+                if(gordoModel.gordoEatenCount == -1)
+                {
+                    return;
+                }
                 gordoModel.gordoEatenCount = (int)targetCountField.GetValue(gordoModel);
 
                 GameObject gameObject = (GameObject)typeof(GordoModel).GetField("gameObj", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(gordoModel);
