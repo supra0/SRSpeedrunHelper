@@ -18,8 +18,8 @@ More features will be added over time.
 To install this mod, follow these steps:
 1. Have Slime Rancher installed (Windows Store / Game Pass version not supported).
 2. Download and run the [UMF Installer](https://umodframework.com/download).
-3. Once installed, download the [latest release](https://github.com/supra0/SRSpeedrunHelper/releases) of this mod.
-4. Move SRSpeedrunHelper.umfmod into the uModFramework/Mods folder located in your Slime Rancher installation directory.
+3. Once UMF is installed, download the [latest release](https://github.com/supra0/SRSpeedrunHelper/releases) of this mod.
+4. Move the downloaded mod file into the uModFramework/Mods folder located in your Slime Rancher installation directory.
 5. Once in-game, open the pause menu and you should see the mod's menu in the top-right corner of your screen.
 
 ## Contributing
