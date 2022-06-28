@@ -20,7 +20,7 @@ To install this mod, follow these steps:
 2. Download and run the [UMF Installer](https://umodframework.com/download).
 3. Once installed, download the [latest release](https://github.com/supra0/SRSpeedrunHelper/releases) of this mod.
 4. Move SRSpeedrunHelper.umfmod into the uModFramework/Mods folder located in your Slime Rancher installation directory.
-5. Once in-game, press the tilde key (\`) to open the mod's window.
+5. Once in-game, open the pause menu and you should see the mod's menu in the top-right corner of your screen.
 
 ## Contributing
 To edit and built this project, follow these steps:
