@@ -32,6 +32,7 @@ namespace SRSpeedrunHelper
 
         // Ohter keybinds
         internal static KeyCode bind_spawnCrate;
+        internal static KeyCode bind_forceSpawnTrigger;
 
         // Other config variables
         internal static bool showModWarning = true;
@@ -88,6 +89,7 @@ namespace SRSpeedrunHelper
 
                     // Other keybinds
                     bind_spawnCrate = cfg.Read("BindSpawnCrate", new UMFConfigKeyCode(KeyCode.None, true), "Spawns a crate in front of the player.");
+                    bind_forceSpawnTrigger = cfg.Read("BindForceSpawnTrigger", new UMFConfigKeyCode(KeyCode.P, true), "Activates the spawner being looked at");
 
                     // Activate spawner bind(s)
                     //bind_activateSpawner = cfg.Read("BindActivateSpawner", new UMFConfigKeyCode(KeyCode.Equals), "Force trigger the spawner you are looking at.";

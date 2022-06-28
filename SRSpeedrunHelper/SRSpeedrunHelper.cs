@@ -84,11 +84,11 @@ namespace SRSpeedrunHelper
 
         private bool showSpawners = false;
 
-        private bool spawnerShowTriggerRate = true;
-        private bool spawnerShowAvgNextSpawn = true;
-        private bool spawnerShowNextSpawnTime = true; // TODO: Show the actual next possible spawn time
-        private bool spawnerShowCountRange = true;
-        private bool spawnerConvertToPercentage = false;
+        public static bool spawnerShowTriggerRate = true;
+        public static bool spawnerShowAvgNextSpawn = true;
+        public static bool spawnerShowNextSpawnTime = true;
+        public static bool spawnerShowCountRange = true;
+        public static bool spawnerConvertToPercentage = false;
         #endregion
 
         #region GIF Recorder Variables
@@ -143,6 +143,7 @@ namespace SRSpeedrunHelper
             UMFGUI.RegisterBind("BindResetTimer", SRSHConfig.bind_resetTimer.ToString(), ResetTimer);
 
             UMFGUI.RegisterBind("BindSpawnCrate", SRSHConfig.bind_spawnCrate.ToString(), SpawnCrate);
+            UMFGUI.RegisterBind("ForceSpawnTrigger", SRSHConfig.bind_forceSpawnTrigger.ToString(), ForceSpawnTrigger);
 
             // Initialize GUI Styles
             LABEL_STYLE_DEFAULT.fontSize = 16;
@@ -520,6 +521,7 @@ namespace SRSpeedrunHelper
                     spawnerShowCountRange = GUILayout.Toggle(spawnerShowCountRange, "Show minimum and maximum amount of slimes spawned from this spawner");
                     spawnerShowTriggerRate = GUILayout.Toggle(spawnerShowTriggerRate, "Show spawn chance of spawners once triggered");
                     spawnerShowAvgNextSpawn = GUILayout.Toggle(spawnerShowAvgNextSpawn, "Show average amount of time until the next possible spawn after a trigger");
+                    spawnerShowNextSpawnTime = GUILayout.Toggle(spawnerShowNextSpawnTime, "Show the time that must be passed in order for this spawner to trigger");
                     //spawnerShowNextSpawnTime = GUILayout.Toggle(spawnerShowNextSpawnTime, "Show the next time this spawner can be triggered"); requires reflection, stored in SpawnerTriggerModel
                     break;
 
@@ -605,7 +607,7 @@ namespace SRSpeedrunHelper
                 return;
             }
 
-            GUILayout.Label(GenerateSpawnerWindowText(targetSpawner.SpawnerTrigger), LABEL_STYLE_DEFAULT);
+            GUILayout.Label(targetSpawner.GetInfoText(), LABEL_STYLE_DEFAULT);
         }
         #endregion
 
@@ -709,94 +711,15 @@ namespace SRSpeedrunHelper
         #endregion
 
         #region Spawner Logic
-        /*
-        void ActivateSpawner()
+        void ForceSpawnTrigger()
         {
             if(targetSpawner != null)
             {
-                // reimplement spawning logic from SpawnerTrigger.OnTriggerEnter() but without the time/collider checks
+                targetSpawner.ForceSpawn();
             }
         }
-        */
 
-        string GenerateSpawnerWindowText(SpawnerTrigger st)
-        {
-            // Show slimes and times
-            string text = "";
-            foreach (DirectedActorSpawner.SpawnConstraint constraint in st.spawner.constraints)
-            {
-                string t = "";
-                DirectedActorSpawner.TimeMode timeMode = constraint.window.timeMode;
-                switch (timeMode)
-                {
-                    case DirectedActorSpawner.TimeMode.ANY:
-                        t = "Any Time:";
-                        break;
-                    case DirectedActorSpawner.TimeMode.DAY:
-                        t = "Daytime:";
-                        break;
-                    case DirectedActorSpawner.TimeMode.NIGHT:
-                        t = "Nighttime:";
-                        break;
-                    default:
-                        t = "Custom Time: " + constraint.window.startHour + "-" + constraint.window.endHour;
-                        break;
-                }
-                text += t + "\n";
-
-                float weightsSum = 0.0f;
-
-                if(spawnerConvertToPercentage)
-                {
-                    foreach(SlimeSet.Member slimeSet in constraint.slimeset.members)
-                    {
-                        weightsSum += slimeSet.weight;
-                    }
-                }
-
-                foreach (SlimeSet.Member slimeSet in constraint.slimeset.members)
-                {
-                    string tmp = slimeSet.prefab.ToString();
-                    text += tmp.Substring(0, tmp.IndexOf(" "));
-                    
-                    if(spawnerConvertToPercentage)
-                    {
-                        text += ": " + (slimeSet.weight / weightsSum) * 100 + "%\n";
-                    }
-                    else
-                    {
-                        text += ": " + slimeSet.weight + "\n";
-                    }
-                    
-                }
-
-                text += "\n";
-            }
-
-            // Add more data based on settings
-            if (spawnerShowCountRange)
-            {
-                text += "Spawn amount: " + st.minSpawn + " - " + st.maxSpawn + "\n";
-            }
-
-            if (spawnerShowTriggerRate)
-            {
-                if(spawnerConvertToPercentage)
-                {
-                    text += "Spawn chance: " + st.chanceOfTrigger*100 + "%\n";
-                }
-                else
-                {
-                    text += "Spawn chance: " + st.chanceOfTrigger + "\n";
-                }
-            }
-            if(spawnerShowAvgNextSpawn)
-            {
-                text += "Avg. hours until next spawn chance: " + st.avgGameHoursBetweenTrigger + "\n";
-            }
-
-            return text;
-        }
+        
         #endregion
 
         #region Misc Methods

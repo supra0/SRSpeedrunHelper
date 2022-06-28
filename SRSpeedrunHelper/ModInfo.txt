@@ -2,7 +2,7 @@ IMPORTANT INFO:
 - Pause the game to open the SRSpeedrunHelper menu. You can press the backtick key (`) to hide and un-hide the menu.
 - Additional hotkeys can be configured in the UMF settings (Shift+F10). The game must be restarted in order for hotkey changes to take effect.
 - The menu can be dragged for repositioning.
-- For now it is highly recommended that you use the SRCheatMenu mod alongside this one. It provides many useful functions such as noclip, inventory editing, and more. In the future, some features from SRCheatMenu may be added to this mod.
+- It is highly recommended that you use the SRCheatMenu mod alongside this one. It provides many useful functions such as noclip, inventory editing, and more. In the future, some features from SRCheatMenu may be added to this mod.
 - Please don't submit runs with this mod, UMF, or any other mod or mod loader installed. They will be rejected.
 
 Patch notes for the current version can be viewed here: https://github.com/supra0/SRSpeedrunHelper/releases
