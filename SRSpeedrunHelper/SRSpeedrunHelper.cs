@@ -650,7 +650,11 @@ namespace SRSpeedrunHelper
             {
                 playerModelTmp.SetCurrency((int)warpData.PlayerNewbucks);
             }
+
+            ForceUnpause();
         }
+
+
 
         void SetPlayerSlots(InventoryData inventoryData)
         {
@@ -718,8 +722,6 @@ namespace SRSpeedrunHelper
                 targetSpawner.ForceSpawn();
             }
         }
-
-        
         #endregion
 
         #region Misc Methods
@@ -787,6 +789,7 @@ namespace SRSpeedrunHelper
         // Logic mostly copied from Pause method, may want to merge some functionality
         bool IsGamePaused()
         {
+            // TODO: Double check that this try-catch is necessary
             TimeDirector timeDirector = null;
             try
             {
@@ -800,9 +803,18 @@ namespace SRSpeedrunHelper
             if(!timeDirector)
             {
                 return false;
-            }
+            }   
 
             return timeDirector.HasPauser();
+        }
+
+        private void ForceUnpause()
+        {
+            PauseMenu pauseMenu = PauseMenu.Instance;
+            if(pauseMenu != null)
+            {
+                pauseMenu.UnPauseGame();
+            }
         }
         #endregion
 

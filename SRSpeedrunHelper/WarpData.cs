@@ -15,10 +15,12 @@ namespace SRSpeedrunHelper
         public static readonly WarpData RANCH_LAB = new WarpData(new Vector3(195.5f, 15.1f, -303.8f), new Vector3(0.0f, 180.0f, 0.0f), "Lab", RegionRegistry.RegionSetId.HOME);
 
         // Dry Reef
-        public static readonly WarpData DRY_REEF_MAIN = new WarpData(new Vector3(-5.7f, 11.9f, 42.1f), new Vector3(0.0f, 54.1f, 0.0f), "Main", RegionRegistry.RegionSetId.HOME);
+        public static readonly WarpData DRY_REEF_START = new WarpData(new Vector3(-5.7f, 11.9f, 42.1f), new Vector3(0.0f, 54.1f, 0.0f), "Start", RegionRegistry.RegionSetId.HOME);
+        public static readonly WarpData DRY_REEF_PINK_GORDO = new WarpData(new Vector3(-92.7f, -0.1f, 28.3f), new Vector3(0.0f, 231.7f, 0.0f), "Pink Gordo", RegionRegistry.RegionSetId.HOME);
+        public static readonly WarpData DRY_REEF_PHOSPHOR_GORDO = new WarpData(new Vector3(-171.6f, 8.6f, 117.8f), new Vector3(0.0f, 205.6f, 0.0f), "Phosphor Gordo", RegionRegistry.RegionSetId.HOME);
+        public static readonly WarpData DRY_REEF_SLIME_SEA = new WarpData(new Vector3(-266.8f, -1.7f, 167.7f), new Vector3(0.0f, 359.8f, 0.0f), "Slime Sea", RegionRegistry.RegionSetId.HOME);
         public static readonly WarpData DRY_REEF_RING_ISLAND = new WarpData(new Vector3(-523.4f, -2.0f, -134.7f), new Vector3(0.0f, 240.9f, 0.0f), "Ring Island", RegionRegistry.RegionSetId.HOME);
-        public static readonly WarpData DRY_REEF_BRIDGE = new WarpData(new Vector3(-266.8f, -1.7f, 167.7f), new Vector3(0.0f, 359.8f, 0.0f), "Bridge", RegionRegistry.RegionSetId.HOME);
-
+        
         // Moss Blanket
         public static readonly WarpData MOSS_BLANKET_ENTRANCE = new WarpData(new Vector3(-150.5f, 15.7f, 367.6f), new Vector3(0.0f, 0.0f, 0.0f), "Entrance", RegionRegistry.RegionSetId.HOME);
         public static readonly WarpData MOSS_BLANKET_CLEARING = new WarpData(new Vector3(-295.1f, 0.4f, 395.5f), new Vector3(0.0f, 0.0f, 0.0f), "Clearing", RegionRegistry.RegionSetId.HOME);
@@ -54,7 +56,7 @@ namespace SRSpeedrunHelper
 
         // Area warp lists
         public static readonly WarpData[] RANCH_WARPS = { RANCH_HOUSE, RANCH_OVERGROWTH, RANCH_GROTTO, RANCH_DOCKS, RANCH_LAB };
-        public static readonly WarpData[] DRY_REEF_WARPS = { DRY_REEF_MAIN, DRY_REEF_BRIDGE, DRY_REEF_RING_ISLAND };
+        public static readonly WarpData[] DRY_REEF_WARPS = { DRY_REEF_START, DRY_REEF_PINK_GORDO, DRY_REEF_PHOSPHOR_GORDO, DRY_REEF_SLIME_SEA, DRY_REEF_RING_ISLAND};
         public static readonly WarpData[] MOSS_BLANKET_WARPS = { MOSS_BLANKET_ENTRANCE, MOSS_BLANKET_CLEARING, MOSS_BLANKET_HONEY_SLIMES, MOSS_BLANKET_LAKE, MOSS_BLANKET_HUNTER_GORDO };
         public static readonly WarpData[] INDIGO_QUARRY_WARPS = { INDIGO_QUARRY_ENTRANCE, INDIGO_QUARRY_ROCK_GORDO_CAVE, INDIGO_QUARRY_BRIDGE, INDIGO_QUARRY_RAD_POND, INDIGO_QUARRY_ASH_ISLE };
         public static readonly WarpData[] ANCIENT_RUINS_WARPS = { ANCIENT_RUINS_COURTYARD, ANCIENT_RUINS_CENTER, ANCIENT_RUINS_ROOFTOP, ANCIENT_RUINS_QUANTUM_GORDO, ANCIENT_RUINS_PORTAL };
