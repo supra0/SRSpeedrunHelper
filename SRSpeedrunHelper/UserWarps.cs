@@ -16,11 +16,15 @@ namespace SRSpeedrunHelper
         public static void AddUserWarp(WarpData warpData)
         {
             userWarps.Add(warpData);
+            WriteToFile();
         }
 
         public static bool RemoveUserWarp(WarpData warpData)
         {
-            return userWarps.Remove(warpData);
+            bool result = userWarps.Remove(warpData);
+            WriteToFile();
+            return result;
+            
         }
 
         public static WarpData GetWarpDataByIndex(int index)
@@ -49,6 +53,7 @@ namespace SRSpeedrunHelper
                 WarpData tmp = userWarps[index - 1];
                 userWarps[index - 1] = userWarps[index];
                 userWarps[index] = tmp;
+                WriteToFile();
                 return true;
             }
         }
@@ -65,24 +70,34 @@ namespace SRSpeedrunHelper
                 WarpData tmp = userWarps[index + 1];
                 userWarps[index + 1] = userWarps[index];
                 userWarps[index] = tmp;
+                WriteToFile();
                 return true;
             }
         }
 
         public static void LoadFromFile()
         {
-            XmlSerializer x = new XmlSerializer(userWarps.GetType());
-            Stream reader = new FileStream(defaultFilepath, FileMode.Open);
-
-            userWarps = (List<WarpData>)x.Deserialize(reader);
+            if (!File.Exists(defaultFilepath))
+            {
+                File.Create(defaultFilepath);
+            }
+            else
+            {
+                using(Stream reader = new FileStream(defaultFilepath, FileMode.Open))
+                {
+                    XmlSerializer x = new XmlSerializer(userWarps.GetType());
+                    userWarps = (List<WarpData>)x.Deserialize(reader);
+                }
+            }
         }
 
         public static void WriteToFile()
         {
-            XmlSerializer x = new XmlSerializer(userWarps.GetType());
-            FileStream file = File.Open(defaultFilepath, FileMode.Create);
-
-            x.Serialize(file, userWarps);
+            using (FileStream file = File.Open(defaultFilepath, FileMode.Create))
+            {
+                XmlSerializer x = new XmlSerializer(userWarps.GetType());
+                x.Serialize(file, userWarps);
+            }
         }
     }
 }

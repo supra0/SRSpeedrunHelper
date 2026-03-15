@@ -12,6 +12,7 @@ namespace SRSpeedrunHelper
     class SRSpeedrunHelper : MonoBehaviour
     {
         #region General GUI Variables
+        // TODO: this probably sucks on 4K, consider redoing this to scale to high res displays. make scale option?
         private static readonly int windowSizeX = 700;
         private static readonly int windowSizeY = 500;
         private static readonly string windowTitle = "Speedrun Helper Menu";
@@ -23,7 +24,7 @@ namespace SRSpeedrunHelper
         private static int currentToolbarTab = 0;
         private static readonly string[] toolbarTabTitles =
         {
-            "Save States",
+            "Warps",
             "Timer",
             "Gordos",
             "Spawner Info",
@@ -40,13 +41,14 @@ namespace SRSpeedrunHelper
         internal static readonly GUIStyle TEXT_STYLE_MOD_WARNING = new GUIStyle();
         #endregion
 
-        #region Save State Variables
+        #region Warp Variables
+        // TODO: why 30? this is why we leave comments lol
         public static readonly int WARP_NAME_MAX_LENGTH = 30;
 
         private static Vector2 warpsScrollPosition = Vector2.zero;
         private static int warpsToolbarTab = 0;
 
-        private static string[] warpsToolbarTabTitles =
+        private static readonly string[] warpsToolbarTabTitles =
         {
             "Presets",
             "Custom",
@@ -60,7 +62,7 @@ namespace SRSpeedrunHelper
 
         private List<WarpData> userWarps;
         private bool refreshUserWarpsFlag = true;
-        private string newUserWarpText = "New save state";
+        private string newUserWarpText = "New warp";
         #endregion
 
         #region Game Timer Variables
@@ -72,6 +74,7 @@ namespace SRSpeedrunHelper
         #endregion
 
         #region Spawner Variables
+        // TODO: same as main window, consider dynamic/configurable window size for high resolutions
         private static readonly int spawnerWindowWidth = 300;
         private static readonly int spawnerWindowHeight = 450;
         private static readonly string spawnerWindowTitle = "Spawner Info";
@@ -162,6 +165,9 @@ namespace SRSpeedrunHelper
             TEXT_STYLE_HEADER.normal.textColor = Color.white;
 
             gameTimer = gameObject.AddComponent<GameTimer>();
+
+            // Pre-load custom user warps
+            UserWarps.LoadFromFile();
         }
 
         public static void Pause(bool pause)
@@ -204,19 +210,13 @@ namespace SRSpeedrunHelper
                     }
                     else
                     {
-                        if(targetSpawner != null)
-                        {
-                            targetSpawner.SetIsBeingLookedAt(false);
-                        }
+                        targetSpawner?.SetIsBeingLookedAt(false);
                         targetSpawner = null;
                     }
                 }
                 else
                 {
-                    if(targetSpawner != null)
-                    {
-                        targetSpawner.SetIsBeingLookedAt(false);
-                    }
+                    targetSpawner?.SetIsBeingLookedAt(false);
                     targetSpawner = null;
                 }
             }
@@ -233,7 +233,7 @@ namespace SRSpeedrunHelper
         void OnGUI()
         {
             // Modify GUI skin values
-            // Have to do this in OnGUI for compatability with other mods (namely, SRCheatMenu)
+            // Have to do this in OnGUI for compatability with other mods (mainly SRCheatMenu)
             GUI.skin.button.fontSize = 16;
             GUI.skin.button.fontStyle = FontStyle.Normal;
             GUI.skin.textField.fontSize = 16;
@@ -350,11 +350,8 @@ namespace SRSpeedrunHelper
                             GUILayout.EndScrollView();
                             GUILayout.FlexibleSpace();
 
-                            if (GUILayout.Button("Save save states to disk (Warning: will overwrite any save states currently present in config file)"))
-                            {
-                                UserWarps.WriteToFile();
-                            }
-                            if (GUILayout.Button("Load save states from disk"))
+                            GUILayout.Label("Warps are saved to disk automatically.", LABEL_STYLE_DEFAULT);
+                            if (GUILayout.Button("Reload warps from disk (do this if you've manually changed the SRSH_userwarps.xml file)"))
                             {
                                 UserWarps.LoadFromFile();
                                 RefreshUserWarpList();
@@ -364,13 +361,12 @@ namespace SRSpeedrunHelper
 
                         case (2):
                             // Create custom warps tab
-                            GUILayout.Label("Save state name", LABEL_STYLE_BOLD);
+                            GUILayout.Label("Warp name", LABEL_STYLE_BOLD);
                             newUserWarpText = GUILayout.TextField(newUserWarpText, WARP_NAME_MAX_LENGTH);
 
                             GUILayout.Label("\nOptions", LABEL_STYLE_BOLD);
 
                             saveAmmoToggle = GUILayout.Toggle(saveAmmoToggle, "Save Ammo");
-
                             saveHealthToggle = GUILayout.Toggle(saveHealthToggle, "Save Health");
                             saveEnergyToggle = GUILayout.Toggle(saveEnergyToggle, "Save Energy");
                             saveNewbucksToggle = GUILayout.Toggle(saveNewbucksToggle, "Save Newbucks");
@@ -414,7 +410,7 @@ namespace SRSpeedrunHelper
 
                                 UserWarps.AddUserWarp(warpDataTmp);
 
-                                newUserWarpText = "New save state";
+                                newUserWarpText = "New warp";
                                 refreshUserWarpsFlag = true;
 
                                 warpsToolbarTab = 1; // switch to Custom tab to indicate the save state was added and to show it in the list
@@ -478,10 +474,10 @@ namespace SRSpeedrunHelper
                     // Excludes Party Gordos, Gold Gordos (Rush Mode), and snared Gordos
                     foreach(string gordoId in GordoHelper.gordoIdsOrdered)
                     {
-                        GordoModel gordoModel = gameModel.GetGordoModel(gordoId);
+                        //GordoModel gordoModel = gameModel.GetGordoModel(gordoId);
                         string gordoName;
 
-                        if(GordoHelper.gordoIdToName.TryGetValue(gordoId, out gordoName))
+                        if (GordoHelper.gordoIdToName.TryGetValue(gordoId, out gordoName))
                         {
                             GUILayout.Label(gordoName, LABEL_STYLE_BOLD);
                         }
