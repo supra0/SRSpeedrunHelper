@@ -4,7 +4,7 @@ using UnityEngine;
 using UModFramework.API;
 using MonomiPark.SlimeRancher.DataModel;
 using System;
-using SRSpeedrunHelper.SRSHGUI;
+using SRSpeedrunHelper.Warps;
 
 namespace SRSpeedrunHelper
 {
@@ -23,7 +23,7 @@ namespace SRSpeedrunHelper
         internal static bool showMenu = true;
 
         internal static int currentToolbarTab = 0;
-        private static readonly string[] toolbarTabTitles = //maybe should move these to individual GUI classes idk
+        private static readonly string[] toolbarTabTitles = //maybe should move these to individual GUI classes idk. refactor 2 when
         {
             "Warps",
             "Timer",
@@ -252,156 +252,6 @@ namespace SRSpeedrunHelper
             {
                 case (0):
                     WarpGUI.DoGUI();
-                    /*
-                    // Warp settings
-                    warpsToolbarTab = GUILayout.Toolbar(warpsToolbarTab, warpsToolbarTabTitles);
-                    switch(warpsToolbarTab)
-                    {
-                        // Predefined warps
-                        case (0):
-                            // Lay out the labels and buttons for the predefined warps
-                            foreach (KeyValuePair<WarpData[], string> area in WarpData.ALL_AREA_WARPS)
-                            {
-                                GUILayout.Label(area.Value, LABEL_STYLE_BOLD);
-
-                                GUILayout.BeginHorizontal();
-                                foreach (WarpData warp in area.Key)
-                                {
-                                    if (GUILayout.Button(warp.Name))
-                                    {
-                                        WarpPlayer(warp);
-
-                                        if(SRSHConfig.saveStateCloseMenu)
-                                        {
-                                            showMenu = false;
-                                            SRSingleton<PauseMenu>.Instance.UnPauseGame();
-                                        }
-                                    }
-                                }
-                                GUILayout.EndHorizontal();
-                            }
-                            break;
-
-                        // User warps
-                        case (1):
-                            warpsScrollPosition = GUILayout.BeginScrollView(warpsScrollPosition);
-
-                            if (refreshUserWarpsFlag || userWarps == null)
-                            {
-                                RefreshUserWarpList();
-                                refreshUserWarpsFlag = false;
-                            }
-
-                            // List user warps
-                            foreach (WarpData warpData in userWarps)
-                            {
-                                GUILayout.BeginHorizontal();
-                                GUILayout.Label(warpData.Name, LABEL_STYLE_BOLD);
-                                if (GUILayout.Button("Load"))
-                                {
-                                    WarpPlayer(warpData);
-
-                                    if (SRSHConfig.saveStateCloseMenu)
-                                    {
-                                        showMenu = false;
-                                        SRSingleton<PauseMenu>.Instance.UnPauseGame();
-                                    }
-                                }
-                                else if (GUILayout.Button("Remove"))
-                                {
-                                    UserWarps.RemoveUserWarp(warpData);
-                                    refreshUserWarpsFlag = true;
-                                }
-                                else if (GUILayout.Button("^"))
-                                {
-                                    UserWarps.MoveWarpUp(userWarps.IndexOf(warpData));
-                                    refreshUserWarpsFlag = true;
-                                }
-                                else if (GUILayout.Button("v"))
-                                {
-                                    UserWarps.MoveWarpDown(userWarps.IndexOf(warpData));
-                                    refreshUserWarpsFlag = true;
-                                }
-
-                                GUILayout.EndHorizontal();
-                            }
-
-                            GUILayout.EndScrollView();
-                            GUILayout.FlexibleSpace();
-
-                            GUILayout.Label("Warps are saved to disk automatically.", LABEL_STYLE_DEFAULT);
-                            if (GUILayout.Button("Reload warps from disk (do this if you've manually changed the SRSH_userwarps.xml file)"))
-                            {
-                                UserWarps.LoadFromFile();
-                                RefreshUserWarpList();
-                            }
-                            
-                            break;
-
-                        case (2):
-                            // Create custom warps tab
-                            GUILayout.Label("Warp name", LABEL_STYLE_BOLD);
-                            newUserWarpText = GUILayout.TextField(newUserWarpText, WARP_NAME_MAX_LENGTH);
-
-                            GUILayout.Label("\nOptions", LABEL_STYLE_BOLD);
-
-                            saveAmmoToggle = GUILayout.Toggle(saveAmmoToggle, "Save Ammo");
-                            saveHealthToggle = GUILayout.Toggle(saveHealthToggle, "Save Health");
-                            saveEnergyToggle = GUILayout.Toggle(saveEnergyToggle, "Save Energy");
-                            saveNewbucksToggle = GUILayout.Toggle(saveNewbucksToggle, "Save Newbucks");
-
-                            GUILayout.FlexibleSpace();
-
-                            if (GUILayout.Button("Add"))
-                            {
-                                InventoryData newInventoryData = null;
-
-                                if (saveAmmoToggle)
-                                {
-                                    PlayerState playerStateTmp = SRSingleton<SceneContext>.Instance.PlayerState;
-                                    newInventoryData = new InventoryData(playerStateTmp.GetAmmoMode());
-
-                                    for (int i = 0; i < playerStateTmp.Ammo.GetUsableSlotCount(); i++)
-                                    {
-                                        Log("Slot " + i.ToString());
-                                        newInventoryData.AddSlot(playerStateTmp.Ammo.GetSlotName(i), playerStateTmp.Ammo.GetSlotCount(i));
-                                        Log("Id: " + playerStateTmp.Ammo.GetSlotName(i).ToString());
-                                        Log("Count: " + playerStateTmp.Ammo.GetSlotCount(i));
-                                    }
-                                }
-
-                                PlayerModel playerModelTmp = GetPlayerModel();
-                                
-                                WarpData warpDataTmp = new WarpData(playerModelTmp.GetPos(), playerModelTmp.GetRot().eulerAngles, newUserWarpText, playerModelTmp.currRegionSetId, newInventoryData);
-
-                                if(saveHealthToggle)
-                                {
-                                    warpDataTmp.PlayerHealth = playerModelTmp.currHealth;
-                                }
-                                if(saveEnergyToggle)
-                                {
-                                    warpDataTmp.PlayerEnergy = playerModelTmp.currEnergy;
-                                }
-                                if(saveNewbucksToggle)
-                                {
-                                    warpDataTmp.PlayerNewbucks = playerModelTmp.currency;
-                                }
-
-                                UserWarps.AddUserWarp(warpDataTmp);
-
-                                newUserWarpText = "New warp";
-                                refreshUserWarpsFlag = true;
-
-                                warpsToolbarTab = 1; // switch to Custom tab to indicate the save state was added and to show it in the list
-                            }
-
-                            break;
-
-                        default:
-                            GUILayout.Label("You should never see this. Oops!");
-                            break;
-                    }
-                    */
                     break;
 
                 case (1):

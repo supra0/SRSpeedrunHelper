@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace SRSpeedrunHelper.SRSHGUI
+namespace SRSpeedrunHelper.Warps
 {
     internal static class WarpGUI
     {
@@ -38,16 +38,16 @@ namespace SRSpeedrunHelper.SRSHGUI
             switch (warpsToolbarTab)
             {
                 // Predefined warps
-                case (0):
+                case 0:
                     DoPresetGUI();
                     break;
 
                 // User warps
-                case (1):
+                case 1:
                     DoCustomGUI();
                     break;
 
-                case (2):
+                case 2:
                     DoCreateGUI();
                     break;
 

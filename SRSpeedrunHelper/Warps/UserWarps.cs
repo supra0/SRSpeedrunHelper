@@ -6,7 +6,7 @@ using System.Linq;
 using System.Xml.Serialization;
 using UModFramework.API;
 
-namespace SRSpeedrunHelper
+namespace SRSpeedrunHelper.Warps
 {
     static class UserWarps
     {

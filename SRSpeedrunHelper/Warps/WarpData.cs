@@ -2,7 +2,7 @@
 using UnityEngine;
 using MonomiPark.SlimeRancher.Regions;
 
-namespace SRSpeedrunHelper
+namespace SRSpeedrunHelper.Warps
 {
     public class WarpData
     {
