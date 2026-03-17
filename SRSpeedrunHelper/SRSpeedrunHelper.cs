@@ -4,6 +4,7 @@ using UnityEngine;
 using UModFramework.API;
 using MonomiPark.SlimeRancher.DataModel;
 using System;
+using SRSpeedrunHelper.SRSHGUI;
 
 namespace SRSpeedrunHelper
 {
@@ -19,10 +20,10 @@ namespace SRSpeedrunHelper
         private static readonly int windowId = 1258;
 
         private static Rect windowRect = new Rect(Screen.width - windowSizeX, 0, windowSizeX, windowSizeY); // Window dimensions and default position. Appears in top-right corner
-        private static bool showMenu = true;
+        internal static bool showMenu = true;
 
-        private static int currentToolbarTab = 0;
-        private static readonly string[] toolbarTabTitles =
+        internal static int currentToolbarTab = 0;
+        private static readonly string[] toolbarTabTitles = //maybe should move these to individual GUI classes idk
         {
             "Warps",
             "Timer",
@@ -39,30 +40,6 @@ namespace SRSpeedrunHelper
         internal static readonly GUIStyle LABEL_STYLE_BOLD = new GUIStyle();
         internal static readonly GUIStyle TEXT_STYLE_HEADER = new GUIStyle();
         internal static readonly GUIStyle TEXT_STYLE_MOD_WARNING = new GUIStyle();
-        #endregion
-
-        #region Warp Variables
-        // TODO: why 30? this is why we leave comments lol
-        public static readonly int WARP_NAME_MAX_LENGTH = 30;
-
-        private static Vector2 warpsScrollPosition = Vector2.zero;
-        private static int warpsToolbarTab = 0;
-
-        private static readonly string[] warpsToolbarTabTitles =
-        {
-            "Presets",
-            "Custom",
-            "Create"
-        };
-
-        private static bool saveAmmoToggle = false;
-        private static bool saveHealthToggle = true;
-        private static bool saveEnergyToggle = true;
-        private static bool saveNewbucksToggle = false;
-
-        private List<WarpData> userWarps;
-        private bool refreshUserWarpsFlag = true;
-        private string newUserWarpText = "New warp";
         #endregion
 
         #region Game Timer Variables
@@ -104,7 +81,7 @@ namespace SRSpeedrunHelper
         #endregion
 
         #region Misc Variables
-        private bool disableEnergyRecovery = false;
+        private static bool disableEnergyRecovery = false;
         public static bool disableFirestorms = false;
         #endregion
 
@@ -128,18 +105,18 @@ namespace SRSpeedrunHelper
             // Register Keybinds
             UMFGUI.RegisterBind("BindShowMenu", SRSHConfig.bind_showMenu.ToString(), () => showMenu = !showMenu);
 
-            UMFGUI.RegisterBind("BindSavestate1", SRSHConfig.bind_userWarp1.ToString(), () => WarpPlayer(UserWarps.GetWarpDataByIndex(0)));
-            UMFGUI.RegisterBind("BindSavestate2", SRSHConfig.bind_userWarp2.ToString(), () => WarpPlayer(UserWarps.GetWarpDataByIndex(1)));
-            UMFGUI.RegisterBind("BindSavestate3", SRSHConfig.bind_userWarp3.ToString(), () => WarpPlayer(UserWarps.GetWarpDataByIndex(2)));
-            UMFGUI.RegisterBind("BindSavestate4", SRSHConfig.bind_userWarp4.ToString(), () => WarpPlayer(UserWarps.GetWarpDataByIndex(3)));
-            UMFGUI.RegisterBind("BindSavestate5", SRSHConfig.bind_userWarp5.ToString(), () => WarpPlayer(UserWarps.GetWarpDataByIndex(4)));
-            UMFGUI.RegisterBind("BindSavestate6", SRSHConfig.bind_userWarp6.ToString(), () => WarpPlayer(UserWarps.GetWarpDataByIndex(5)));
-            UMFGUI.RegisterBind("BindSavestate7", SRSHConfig.bind_userWarp7.ToString(), () => WarpPlayer(UserWarps.GetWarpDataByIndex(6)));
-            UMFGUI.RegisterBind("BindSavestate8", SRSHConfig.bind_userWarp8.ToString(), () => WarpPlayer(UserWarps.GetWarpDataByIndex(7)));
-            UMFGUI.RegisterBind("BindSavestate9", SRSHConfig.bind_userWarp9.ToString(), () => WarpPlayer(UserWarps.GetWarpDataByIndex(8)));
-            UMFGUI.RegisterBind("BindSavestate10", SRSHConfig.bind_userWarp10.ToString(), () => WarpPlayer(UserWarps.GetWarpDataByIndex(9)));
-            UMFGUI.RegisterBind("BindSavestate11", SRSHConfig.bind_userWarp11.ToString(), () => WarpPlayer(UserWarps.GetWarpDataByIndex(10)));
-            UMFGUI.RegisterBind("BindSavestate12", SRSHConfig.bind_userWarp12.ToString(), () => WarpPlayer(UserWarps.GetWarpDataByIndex(11)));
+            UMFGUI.RegisterBind("BindSavestate1", SRSHConfig.bind_userWarp1.ToString(), () => UserWarps.WarpPlayer(UserWarps.GetWarpDataByIndex(0)));
+            UMFGUI.RegisterBind("BindSavestate2", SRSHConfig.bind_userWarp2.ToString(), () => UserWarps.WarpPlayer(UserWarps.GetWarpDataByIndex(1)));
+            UMFGUI.RegisterBind("BindSavestate3", SRSHConfig.bind_userWarp3.ToString(), () => UserWarps.WarpPlayer(UserWarps.GetWarpDataByIndex(2)));
+            UMFGUI.RegisterBind("BindSavestate4", SRSHConfig.bind_userWarp4.ToString(), () => UserWarps.WarpPlayer(UserWarps.GetWarpDataByIndex(3)));
+            UMFGUI.RegisterBind("BindSavestate5", SRSHConfig.bind_userWarp5.ToString(), () => UserWarps.WarpPlayer(UserWarps.GetWarpDataByIndex(4)));
+            UMFGUI.RegisterBind("BindSavestate6", SRSHConfig.bind_userWarp6.ToString(), () => UserWarps.WarpPlayer(UserWarps.GetWarpDataByIndex(5)));
+            UMFGUI.RegisterBind("BindSavestate7", SRSHConfig.bind_userWarp7.ToString(), () => UserWarps.WarpPlayer(UserWarps.GetWarpDataByIndex(6)));
+            UMFGUI.RegisterBind("BindSavestate8", SRSHConfig.bind_userWarp8.ToString(), () => UserWarps.WarpPlayer(UserWarps.GetWarpDataByIndex(7)));
+            UMFGUI.RegisterBind("BindSavestate9", SRSHConfig.bind_userWarp9.ToString(), () => UserWarps.WarpPlayer(UserWarps.GetWarpDataByIndex(8)));
+            UMFGUI.RegisterBind("BindSavestate10", SRSHConfig.bind_userWarp10.ToString(), () => UserWarps.WarpPlayer(UserWarps.GetWarpDataByIndex(9)));
+            UMFGUI.RegisterBind("BindSavestate11", SRSHConfig.bind_userWarp11.ToString(), () => UserWarps.WarpPlayer(UserWarps.GetWarpDataByIndex(10)));
+            UMFGUI.RegisterBind("BindSavestate12", SRSHConfig.bind_userWarp12.ToString(), () => UserWarps.WarpPlayer(UserWarps.GetWarpDataByIndex(11)));
 
             UMFGUI.RegisterBind("BindStartTimer", SRSHConfig.bind_startTimer.ToString(), StartTimer);
             UMFGUI.RegisterBind("BindStopTimer", SRSHConfig.bind_stopTimer.ToString(), StopTimer);
@@ -167,7 +144,7 @@ namespace SRSpeedrunHelper
             gameTimer = gameObject.AddComponent<GameTimer>();
 
             // Pre-load custom user warps
-            UserWarps.LoadFromFile();
+            UserWarps.LoadWarps();
         }
 
         public static void Pause(bool pause)
@@ -230,7 +207,7 @@ namespace SRSpeedrunHelper
         #endregion
 
         #region GUI
-        void OnGUI()
+        public void OnGUI()
         {
             // Modify GUI skin values
             // Have to do this in OnGUI for compatability with other mods (mainly SRCheatMenu)
@@ -262,7 +239,7 @@ namespace SRSpeedrunHelper
             }
         }
 
-        void ShowMenu(int winId)
+        internal void ShowMenu(int winId)
         {
             if (windowId != winId)
             {
@@ -274,6 +251,8 @@ namespace SRSpeedrunHelper
             switch (currentToolbarTab)
             {
                 case (0):
+                    WarpGUI.DoGUI();
+                    /*
                     // Warp settings
                     warpsToolbarTab = GUILayout.Toolbar(warpsToolbarTab, warpsToolbarTabTitles);
                     switch(warpsToolbarTab)
@@ -422,7 +401,7 @@ namespace SRSpeedrunHelper
                             GUILayout.Label("You should never see this. Oops!");
                             break;
                     }
-
+                    */
                     break;
 
                 case (1):
@@ -595,7 +574,7 @@ namespace SRSpeedrunHelper
             GUI.DragWindow();
         }
 
-        void ShowSpawnerMenu(int winId)
+        private void ShowSpawnerMenu(int winId)
         {
             if(winId != spawnerWindowId)
             {
@@ -604,82 +583,6 @@ namespace SRSpeedrunHelper
             }
 
             GUILayout.Label(targetSpawner.GetInfoText(), LABEL_STYLE_DEFAULT);
-        }
-        #endregion
-
-        #region Warp Logic
-        void RefreshUserWarpList()
-        {
-            userWarps = UserWarps.GetUserWarps();
-        }
-
-        void WarpPlayer(WarpData warpData)
-        {
-            if(warpData == null)
-            {
-                return;
-            }
-            if(Levels.isMainMenu() || Levels.isSpecial())
-            {
-                return;
-            }
-
-            PlayerModel playerModelTmp = GetPlayerModel();
-            playerModelTmp.SetTransform(warpData.Position, warpData.RotEuler);
-            playerModelTmp.SetCurrRegionSet(warpData.RegionSetId);
-
-            if(warpData.HasInventoryData())
-            {
-                SetPlayerSlots(warpData.InventoryData);
-            }
-
-            if(warpData.PlayerHealth != null)
-            {
-                playerModelTmp.SetHealth((float)warpData.PlayerHealth);
-                playerModelTmp.healthBurstAfter = SceneContext.Instance.TimeDirector.WorldTime() + 300.0;
-            }
-            if(warpData.PlayerEnergy != null)
-            {
-                SetPlayerEnergy((float)warpData.PlayerEnergy);
-            }
-            if(warpData.PlayerNewbucks != null)
-            {
-                playerModelTmp.SetCurrency((int)warpData.PlayerNewbucks);
-            }
-
-            ForceUnpause();
-        }
-
-
-
-        void SetPlayerSlots(InventoryData inventoryData)
-        {
-            if(inventoryData == null)
-            {
-                return;
-            }
-
-            PlayerState playerStateTmp = SceneContext.Instance.PlayerState;
-            playerStateTmp.SetAmmoMode(inventoryData.AmmoMode);
-
-            playerStateTmp.Ammo.Clear();
-            int slotNum = 0;
-
-            foreach(InventoryData.IdentifiableCountPair slot in inventoryData.AmmoList)
-            {
-                playerStateTmp.Ammo.MaybeAddToSpecificSlot(slot.Id, null, slotNum, slot.Count, true);
-
-                // Special case for Slimes
-                // Since we don't pass an Identifiable to Ammo.MaybeAddToSpecificSlot, SlimeEmotion data never gets added (stays null)
-                // This causes a bug when trying to shoot slimes added to ammo slots
-                // Calling Ammo.Replace adds default SlimeEmotion data
-                // Could probably do this in a less roundabout way using reflection (ammo slots are private)
-                if(Identifiable.IsSlime(slot.Id))
-                {
-                    playerStateTmp.Ammo.Replace(slot.Id, slot.Id);
-                }
-                slotNum++;
-            }
         }
         #endregion
 
@@ -721,12 +624,12 @@ namespace SRSpeedrunHelper
         #endregion
 
         #region Misc Methods
-        PlayerModel GetPlayerModel()
+        internal static PlayerModel GetPlayerModel()
         {
             return SceneContext.Instance.GameModel.GetPlayerModel();
         }
 
-        void SpawnCrate()
+        internal static void SpawnCrate()
         {
             if(Levels.isMainMenu() || Levels.isSpecial())
             {
@@ -740,7 +643,7 @@ namespace SRSpeedrunHelper
             SRBehaviour.InstantiateActor(cratePrefab, GetPlayerModel().currRegionSetId, cratePos, Quaternion.identity);
         }
 
-        void SetPlayerEnergy(float energy)
+        internal static void SetPlayerEnergy(float energy)
         {
             PlayerModel playerModel = GetPlayerModel();
             playerModel.SetEnergy(energy);
@@ -754,12 +657,12 @@ namespace SRSpeedrunHelper
             }
         }
 
-        void SetEnergyRecoverAfter(double time)
+        internal static void SetEnergyRecoverAfter(double time)
         {
             GetPlayerModel().energyRecoverAfter = time;
         }
 
-        void SetFirestormsActive(bool active)
+        internal static void SetFirestormsActive(bool active)
         {
             WorldModel worldModel = SceneContext.Instance.GameModel.GetWorldModel();
 
@@ -783,7 +686,7 @@ namespace SRSpeedrunHelper
 
         // Returns whether or not the game is paused
         // Logic mostly copied from Pause method, may want to merge some functionality
-        bool IsGamePaused()
+        internal static bool IsGamePaused()
         {
             // TODO: Double check that this try-catch is necessary
             TimeDirector timeDirector = null;
@@ -804,7 +707,7 @@ namespace SRSpeedrunHelper
             return timeDirector.HasPauser();
         }
 
-        private void ForceUnpause()
+        internal static void ForceUnpause()
         {
             PauseMenu pauseMenu = PauseMenu.Instance;
             if(pauseMenu != null)
