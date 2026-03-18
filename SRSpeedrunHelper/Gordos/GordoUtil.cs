@@ -4,7 +4,7 @@ using MonomiPark.SlimeRancher.DataModel;
 using UModFramework.API;
 using UnityEngine;
 
-namespace SRSpeedrunHelper
+namespace SRSpeedrunHelper.Gordos
 {
     static class GordoUtil
     {
@@ -52,7 +52,6 @@ namespace SRSpeedrunHelper
 
         private static readonly FieldInfo targetCountField = typeof(GordoModel).GetField("targetCount", BindingFlags.Instance | BindingFlags.NonPublic);
 
-        #region Helper Methods
         // Pops the given Gordo. If Gordo is loaded it will start the pop animation, otherwise will immediately pop when loaded
         public static void PopGordo(string gordoId)
         {
@@ -111,6 +110,5 @@ namespace SRSpeedrunHelper
                 return "Status: Fed " + gordoModel.gordoEatenCount + "/" + (int)targetCountField.GetValue(gordoModel);
             }
         }
-        #endregion
     }
 }
