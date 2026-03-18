@@ -29,8 +29,6 @@ namespace SRSpeedrunHelper.Warps
         private static bool saveEnergyToggle = true;
         private static bool saveNewbucksToggle = false;
 
-
-
         internal static void DoGUI()
         {
             // Warp settings
@@ -191,10 +189,6 @@ namespace SRSpeedrunHelper.Warps
                 warpsToolbarTab = 1; // switch to Custom tab to indicate the save state was added and to show it in the list
             }
         }
-        #endregion
-
-        #region Logic
-
         #endregion
     }
 }

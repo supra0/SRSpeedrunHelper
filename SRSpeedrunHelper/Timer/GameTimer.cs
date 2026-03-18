@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace SRSpeedrunHelper
+namespace SRSpeedrunHelper.Timer
 {
     class GameTimer : MonoBehaviour
     {
@@ -23,9 +23,11 @@ namespace SRSpeedrunHelper
 
         void Awake()
         {
-            timerStyle = new GUIStyle();
-            timerStyle.fontSize = 32;
-            timerStyle.wordWrap = false;
+            timerStyle = new GUIStyle
+            {
+                fontSize = 32,
+                wordWrap = false
+            };
             timerStyle.normal.textColor = activeColor;
 
             UpdateDisplayString();

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SRSpeedrunHelper
+namespace SRSpeedrunHelper.Warps
 {
     public class InventoryData
     {

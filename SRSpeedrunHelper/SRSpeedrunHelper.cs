@@ -5,6 +5,7 @@ using UModFramework.API;
 using MonomiPark.SlimeRancher.DataModel;
 using System;
 using SRSpeedrunHelper.Warps;
+using SRSpeedrunHelper.Timer;
 
 namespace SRSpeedrunHelper
 {
@@ -43,7 +44,7 @@ namespace SRSpeedrunHelper
         #endregion
 
         #region Game Timer Variables
-        private GameTimer gameTimer;
+        internal static GameTimer gameTimer;
         #endregion
 
         #region Gordo Variables
@@ -142,6 +143,7 @@ namespace SRSpeedrunHelper
             TEXT_STYLE_HEADER.normal.textColor = Color.white;
 
             gameTimer = gameObject.AddComponent<GameTimer>();
+            TimerGUI.RegisterTimer(gameTimer);
 
             // Pre-load custom user warps
             UserWarps.LoadWarps();
@@ -255,25 +257,7 @@ namespace SRSpeedrunHelper
                     break;
 
                 case (1):
-                    // Timer settings
-                    gameTimer.showTimer = GUILayout.Toggle(gameTimer.showTimer, "Show timer");
-
-                    if (gameTimer.showTimer)
-                    {
-                        if (GUILayout.Button("Start timer"))
-                        {
-                            StartTimer();
-                        }
-                        else if (GUILayout.Button("Stop timer"))
-                        {
-                            StopTimer();
-                        }
-                        else if (GUILayout.Button("Reset timer"))
-                        {
-                            ResetTimer();
-                        }
-                        gameTimer.showMilliseconds = GUILayout.Toggle(gameTimer.showMilliseconds, "Show milliseconds");
-                    }
+                    TimerGUI.DoGUI();
                     break;
 
                 case (2):
@@ -304,9 +288,8 @@ namespace SRSpeedrunHelper
                     foreach(string gordoId in GordoHelper.gordoIdsOrdered)
                     {
                         //GordoModel gordoModel = gameModel.GetGordoModel(gordoId);
-                        string gordoName;
 
-                        if (GordoHelper.gordoIdToName.TryGetValue(gordoId, out gordoName))
+                        if (GordoHelper.gordoIdToName.TryGetValue(gordoId, out string gordoName))
                         {
                             GUILayout.Label(gordoName, LABEL_STYLE_BOLD);
                         }
