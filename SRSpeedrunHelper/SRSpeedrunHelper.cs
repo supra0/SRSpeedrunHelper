@@ -6,6 +6,7 @@ using MonomiPark.SlimeRancher.DataModel;
 using System;
 using SRSpeedrunHelper.Warps;
 using SRSpeedrunHelper.Timer;
+using SRSpeedrunHelper.Spawners;
 
 namespace SRSpeedrunHelper
 {
@@ -74,7 +75,7 @@ namespace SRSpeedrunHelper
 
         #region GIF Recorder Variables
         private const float GIF_LENGTH_MIN = 3.5f; // 3.5 = game's default
-        private const float GIF_LENGTH_MAX = 10.0f;
+        private const float GIF_LENGTH_MAX = 10.0f; //TODO: why 10 seconds max?
 
         private bool gifLengthWasChanged = false;
 
@@ -119,9 +120,9 @@ namespace SRSpeedrunHelper
             UMFGUI.RegisterBind("BindSavestate11", SRSHConfig.bind_userWarp11.ToString(), () => UserWarps.WarpPlayer(UserWarps.GetWarpDataByIndex(10)));
             UMFGUI.RegisterBind("BindSavestate12", SRSHConfig.bind_userWarp12.ToString(), () => UserWarps.WarpPlayer(UserWarps.GetWarpDataByIndex(11)));
 
-            UMFGUI.RegisterBind("BindStartTimer", SRSHConfig.bind_startTimer.ToString(), StartTimer);
-            UMFGUI.RegisterBind("BindStopTimer", SRSHConfig.bind_stopTimer.ToString(), StopTimer);
-            UMFGUI.RegisterBind("BindResetTimer", SRSHConfig.bind_resetTimer.ToString(), ResetTimer);
+            UMFGUI.RegisterBind("BindStartTimer", SRSHConfig.bind_startTimer.ToString(), () => gameTimer.StartTimer());
+            UMFGUI.RegisterBind("BindPauseTimer", SRSHConfig.bind_pauseTimer.ToString(), () => gameTimer.PauseTimer());
+            UMFGUI.RegisterBind("BindResetTimer", SRSHConfig.bind_resetTimer.ToString(), () => gameTimer.ResetTimer());
 
             UMFGUI.RegisterBind("BindSpawnCrate", SRSHConfig.bind_spawnCrate.ToString(), SpawnCrate);
             UMFGUI.RegisterBind("ForceSpawnTrigger", SRSHConfig.bind_forceSpawnTrigger.ToString(), ForceSpawnTrigger);
@@ -265,16 +266,16 @@ namespace SRSpeedrunHelper
                     GUILayout.BeginHorizontal();
                     if(GUILayout.Button("Pop all Gordos"))
                     {
-                        foreach(string gordoId in GordoHelper.gordoIdsOrdered)
+                        foreach(string gordoId in GordoUtil.gordoIdsOrdered)
                         {
-                            GordoHelper.PopGordo(gordoId);
+                            GordoUtil.PopGordo(gordoId);
                         }
                     }
                     if(GUILayout.Button("Reset all Gordos"))
                     {
-                        foreach (string gordoId in GordoHelper.gordoIdsOrdered)
+                        foreach (string gordoId in GordoUtil.gordoIdsOrdered)
                         {
-                            GordoHelper.ResetGordo(gordoId);
+                            GordoUtil.ResetGordo(gordoId);
                         }
                     }
                     GUILayout.EndHorizontal();
@@ -285,24 +286,24 @@ namespace SRSpeedrunHelper
 
                     // Present them in the order defined in GordoHelper.gordoIdsOrdered
                     // Excludes Party Gordos, Gold Gordos (Rush Mode), and snared Gordos
-                    foreach(string gordoId in GordoHelper.gordoIdsOrdered)
+                    foreach(string gordoId in GordoUtil.gordoIdsOrdered)
                     {
                         //GordoModel gordoModel = gameModel.GetGordoModel(gordoId);
 
-                        if (GordoHelper.gordoIdToName.TryGetValue(gordoId, out string gordoName))
+                        if (GordoUtil.gordoIdToName.TryGetValue(gordoId, out string gordoName))
                         {
                             GUILayout.Label(gordoName, LABEL_STYLE_BOLD);
                         }
 
-                        GUILayout.Label(GordoHelper.GetGordoStatus(gordoId), LABEL_STYLE_DEFAULT);
+                        GUILayout.Label(GordoUtil.GetGordoStatus(gordoId), LABEL_STYLE_DEFAULT);
                         if (GUILayout.Button("Pop Gordo"))
                         {
-                            GordoHelper.PopGordo(gordoId);
+                            GordoUtil.PopGordo(gordoId);
                         }
 
                         if (GUILayout.Button("Reset Gordo"))
                         {
-                            GordoHelper.ResetGordo(gordoId);
+                            GordoUtil.ResetGordo(gordoId);
                         }
                     }
 
@@ -419,40 +420,10 @@ namespace SRSpeedrunHelper
         }
         #endregion
 
-        #region Timer Logic
-        private void StartTimer()
-        {
-            gameTimer.showTimer = true; // if the start hotkey is pressed, make the timer visible
-            if(gameTimer != null)
-            {
-                gameTimer.StartTimer();
-            }
-        }
-
-        private void StopTimer()
-        {
-            if (gameTimer != null)
-            {
-                gameTimer.StopTimer();
-            }
-        }
-
-        private void ResetTimer()
-        {
-            if (gameTimer != null)
-            {
-                gameTimer.ResetTimer();
-            }
-        }
-        #endregion
-
         #region Spawner Logic
         void ForceSpawnTrigger()
         {
-            if(targetSpawner != null)
-            {
-                targetSpawner.ForceSpawn();
-            }
+            targetSpawner?.ForceSpawn();
         }
         #endregion
 
@@ -473,7 +444,7 @@ namespace SRSpeedrunHelper
             Vector3 cratePos = playerTransform.TransformPoint(Vector3.forward * 5 + new Vector3(0, 1.8f, 0));
 
             GameObject cratePrefab = GameContext.Instance.LookupDirector.GetPrefab(Identifiable.Id.CRATE_REEF_01);
-            SRBehaviour.InstantiateActor(cratePrefab, GetPlayerModel().currRegionSetId, cratePos, Quaternion.identity);
+            SRBehaviour.InstantiateActor(cratePrefab, GetPlayerModel().currRegionSetId, cratePos, Quaternion.identity); //TODO: orient in same direction player is facing (horizontally/yaw)?
         }
 
         internal static void SetPlayerEnergy(float energy)
@@ -499,6 +470,7 @@ namespace SRSpeedrunHelper
         {
             WorldModel worldModel = SceneContext.Instance.GameModel.GetWorldModel();
 
+            // TODO: maybe better if this would be a patch of FirestormActivator (or the relevant class) that just checks if our setting is checked or not when a firestorm is meant to go off. worth it or no?
             if(active)
             {
                 // Attempt to restore regular firestorm behavior
@@ -540,13 +512,14 @@ namespace SRSpeedrunHelper
             return timeDirector.HasPauser();
         }
 
+        internal static bool IsPauseMenuActive()
+        {
+            return PauseMenu.Instance.pauseUI.activeSelf;
+        }
+
         internal static void ForceUnpause()
         {
-            PauseMenu pauseMenu = PauseMenu.Instance;
-            if(pauseMenu != null)
-            {
-                pauseMenu.UnPauseGame();
-            }
+            PauseMenu.Instance?.UnPauseGame();
         }
         #endregion
 

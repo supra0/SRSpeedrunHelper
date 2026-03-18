@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
 using MonomiPark.SlimeRancher.DataModel;
+using UModFramework.API;
 using UnityEngine;
 
 namespace SRSpeedrunHelper
 {
-    static class GordoHelper
+    static class GordoUtil
     {
         #region Gordo IDs
         public static readonly Dictionary<string, string> gordoIdToName = new Dictionary<string, string>()
@@ -52,6 +53,7 @@ namespace SRSpeedrunHelper
         private static readonly FieldInfo targetCountField = typeof(GordoModel).GetField("targetCount", BindingFlags.Instance | BindingFlags.NonPublic);
 
         #region Helper Methods
+        // Pops the given Gordo. If Gordo is loaded it will start the pop animation, otherwise will immediately pop when loaded
         public static void PopGordo(string gordoId)
         {
             GordoModel gordoModel = SceneContext.Instance.GameModel.GetGordoModel(gordoId);
@@ -74,6 +76,7 @@ namespace SRSpeedrunHelper
             }
         }
 
+        // Resets the given Gordo to its default state
         public static void ResetGordo(string gordoId)
         {
             GordoModel gordoModel = SRSingleton<SceneContext>.Instance.GameModel.GetGordoModel(gordoId);
@@ -95,6 +98,7 @@ namespace SRSpeedrunHelper
             }
         }
 
+        // Returns a text representation of the specified Gordo's status
         public static string GetGordoStatus(string gordoId)
         {
             GordoModel gordoModel = SRSingleton<SceneContext>.Instance.GameModel.GetGordoModel(gordoId);

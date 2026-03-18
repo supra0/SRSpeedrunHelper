@@ -18,19 +18,26 @@ namespace SRSpeedrunHelper.Timer
 
             if (gameTimer.showTimer)
             {
-                if (GUILayout.Button("Start timer"))
+                GUILayout.Label("Controls", SRSpeedrunHelper.LABEL_STYLE_BOLD);
+                GUILayout.Label("Tip: Change keybinds in the UMF settings! (Shift+F10)", SRSpeedrunHelper.LABEL_STYLE_DEFAULT);
+                if (GUILayout.Button("Start timer (Bind: " + SRSHConfig.bind_startTimer.ToString() + ")"))
                 {
                     gameTimer?.StartTimer();
                 }
-                else if (GUILayout.Button("Stop timer"))
+                else if (GUILayout.Button("Pause timer (Bind: " + SRSHConfig.bind_pauseTimer.ToString() + ")"))
                 {
-                    gameTimer?.StopTimer();
+                    gameTimer?.PauseTimer();
                 }
-                else if (GUILayout.Button("Reset timer"))
+                else if (GUILayout.Button("Reset timer (Bind: " + SRSHConfig.bind_resetTimer.ToString() + ")"))
                 {
                     gameTimer?.ResetTimer();
                 }
+
+                GUILayout.Label("\nOptions", SRSpeedrunHelper.LABEL_STYLE_BOLD);
                 gameTimer.showMilliseconds = GUILayout.Toggle(gameTimer.showMilliseconds, "Show milliseconds");
+                gameTimer.pauseWhileLoading = GUILayout.Toggle(gameTimer.pauseWhileLoading, "Pause timer while the game is loading");
+                gameTimer.pauseOnMainMenu = GUILayout.Toggle(gameTimer.pauseOnMainMenu, "Pause timer while on main menu");
+                gameTimer.pauseWhileGamePaused = GUILayout.Toggle(gameTimer.pauseWhileGamePaused, "Pause timer while the game is paused");
             }
         }
 

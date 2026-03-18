@@ -3,7 +3,7 @@ using System.Reflection;
 using MonomiPark.SlimeRancher.DataModel;
 using UnityEngine;
 
-namespace SRSpeedrunHelper
+namespace SRSpeedrunHelper.Spawners
 {
     class SpawnerInfoNode : MonoBehaviour
     {
@@ -72,7 +72,7 @@ namespace SRSpeedrunHelper
 
                     if (SRSpeedrunHelper.spawnerConvertToPercentage)
                     {
-                        text += ": " + (slimeSet.weight / weightsSum) * 100 + "%\n";
+                        text += ": " + slimeSet.weight / weightsSum * 100 + "%\n";
                     }
                     else
                     {
@@ -113,7 +113,7 @@ namespace SRSpeedrunHelper
                 {
                     int nextTriggerTime = (int)model.nextTriggerTime;
 
-                    int day = (nextTriggerTime / 3600 / 24) + 1;
+                    int day = nextTriggerTime / 3600 / 24 + 1;
                     int hour = nextTriggerTime / 3600 % 24;
                     int minute = nextTriggerTime % 60;
 
@@ -143,8 +143,8 @@ namespace SRSpeedrunHelper
             }
 
             // Spawn logic copied directly from SpawnerTrigger.OnTriggerEnter
-            float num = (SpawnerTrigger.spawner is DirectedSlimeSpawner) ? SRSingleton<SceneContext>.Instance.ModDirector.SlimeCountFactor() : 1f;
-            SpawnerTrigger.StartCoroutine(SpawnerTrigger.spawner.Spawn(Mathf.RoundToInt((float)Randoms.SHARED.GetInRange(SpawnerTrigger.minSpawn, SpawnerTrigger.maxSpawn + 1) * num), Randoms.SHARED));
+            float num = SpawnerTrigger.spawner is DirectedSlimeSpawner ? SRSingleton<SceneContext>.Instance.ModDirector.SlimeCountFactor() : 1f;
+            SpawnerTrigger.StartCoroutine(SpawnerTrigger.spawner.Spawn(Mathf.RoundToInt(Randoms.SHARED.GetInRange(SpawnerTrigger.minSpawn, SpawnerTrigger.maxSpawn + 1) * num), Randoms.SHARED));
         }
 
         private void SetSpawnerTrigger(SpawnerTrigger trigger)
