@@ -1,14 +1,14 @@
 # Slime Rancher Speedrun Helper Mod
-This mod aims to help Slime Rancher speedrunners route and practice for Slime Rancher speedruns.
+This mod aims to help Slime Rancher speedrunners route, research, and practice for Slime Rancher speedruns.
 
 Please note that under the rules of the Slime Rancher speedrunning leaderboard, mods and mod loaders cannot be installed during submitted runs. Please uninstall this mod and UMF before starting a run you intend to submit, or alternatively keep a separate installation of the game for the use of mods.
 
 ## Features
 * Many pre-set warp locations.
 * Custom warp locations with the option to save your inventory (similar to save states).
-* An in-game timer. Includes hotkeys for starting, stopping, and resetting.
+* An in-game timer. Includes hotkeys for starting, pausing, and resetting.
 * Reset Gordos to their default state, or pop them instantly.
-* View detailed info on most slime spawners.
+* View detailed info on slime spawners.
 * Extend the length of exported GIFs up to 10 seconds.
 * And more!
 
@@ -24,9 +24,9 @@ To install this mod, follow these steps:
 
 ## Contributing
 To edit and built this project, follow these steps:
- 1. Install Visual Studio 2017 or higher.
- 2. Install Slime Rancher.
- 3. Install UMF (uMod Framework) v0.53.0 or higher into the game.
- 4. Clone or download this project.
- 5. Edit GamePaths.xml and change the paths to where your game is installed.
- 6. Load the project up in Visual Studio by double clicking SRSpeedrunHelper.sln.
+1. Install Visual Studio 2017 or higher.
+2. Install Slime Rancher.
+3. Install UMF (uMod Framework) v0.53.0 or higher into the game.
+4. Clone or download this project.
+5. Load the project in Visual Studio by double clicking SRSpeedrunHelper.sln.
+6. If needed, edit GamePaths.xml and change the paths to where your game is installed.
