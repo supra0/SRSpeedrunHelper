@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SRSpeedrunHelper
+namespace SRSpeedrunHelper.Spawners
 {
     /*
      * This was my first attempt at implementing the spawner info popups.
@@ -41,7 +41,7 @@ namespace SRSpeedrunHelper
             spawnerSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             spawnerSphere.transform.position = spawnerTrigger.spawner.transform.position; // set to position of spawner, not spawner trigger
             spawnerSphere.transform.localScale = new Vector3(SPHERE_SCALE, SPHERE_SCALE, SPHERE_SCALE);
-            spawnerSphere.transform.SetParent(this.transform);
+            spawnerSphere.transform.SetParent(transform);
 
             spawnerSphereCollider = spawnerSphere.GetComponent<Collider>();
             if(spawnerSphereCollider == null)
