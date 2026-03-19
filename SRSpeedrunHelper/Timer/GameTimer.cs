@@ -45,7 +45,7 @@ namespace SRSpeedrunHelper.Timer
             if(running)
             {
                 // Check if timer update should be blocked
-                if(pauseWhileLoading && WorldUtil.IsGameLoading() || pauseOnMainMenu && Levels.isMainMenu() || pauseWhileGamePaused && SRSpeedrunHelper.IsPauseMenuActive())
+                if(pauseWhileLoading && WorldUtil.IsGameLoading() || pauseOnMainMenu && Levels.isMainMenu() || pauseWhileGamePaused && PauseMenu.Instance.pauseUI.activeSelf)
                 {
                     return;
                 }

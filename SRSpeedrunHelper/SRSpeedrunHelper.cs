@@ -31,14 +31,12 @@ namespace SRSpeedrunHelper
             "Warps",
             "Timer",
             "Gordos",
-            "Spawner Info",
+            "Spawners",
             "Misc."
         };
 
         private static Rect modWarningRect = new Rect(10, 0, 0, 0);
-        #endregion
 
-        #region GUI Skins
         internal static readonly GUIStyle LABEL_STYLE_DEFAULT = new GUIStyle();
         internal static readonly GUIStyle LABEL_STYLE_BOLD = new GUIStyle();
         internal static readonly GUIStyle TEXT_STYLE_HEADER = new GUIStyle();
@@ -51,24 +49,8 @@ namespace SRSpeedrunHelper
 
 
         #region Spawner Variables
-        // TODO: same as main window, consider dynamic/configurable window size for high resolutions
-        private static readonly int spawnerWindowWidth = 300;
-        private static readonly int spawnerWindowHeight = 450;
-        private static readonly string spawnerWindowTitle = "Spawner Info";
-        private static readonly int spawnerWindowId = 33734;
-
-        private static Rect spawnerWindowRect = new Rect(Screen.width - spawnerWindowWidth, Screen.height - spawnerWindowHeight, spawnerWindowWidth, spawnerWindowHeight); // Bottom-right corner
-
         private RaycastHit rayHit = new RaycastHit();
-        private SpawnerInfoNode targetSpawner;
-
-        private bool showSpawners = false;
-
-        public static bool spawnerShowTriggerRate = true;
-        public static bool spawnerShowAvgNextSpawn = true;
-        public static bool spawnerShowNextSpawnTime = true;
-        public static bool spawnerShowCountRange = true;
-        public static bool spawnerConvertToPercentage = false;
+        internal static SpawnerInfoNode targetSpawner;
         #endregion
 
         #region GIF Recorder Variables
@@ -123,7 +105,7 @@ namespace SRSpeedrunHelper
             UMFGUI.RegisterBind("BindResetTimer", SRSHConfig.bind_resetTimer.ToString(), () => gameTimer.ResetTimer());
 
             UMFGUI.RegisterBind("BindSpawnCrate", SRSHConfig.bind_spawnCrate.ToString(), SpawnCrate);
-            UMFGUI.RegisterBind("ForceSpawnTrigger", SRSHConfig.bind_forceSpawnTrigger.ToString(), ForceSpawnTrigger);
+            //UMFGUI.RegisterBind("ForceSpawnTrigger", SRSHConfig.bind_forceSpawnTrigger.ToString(), ForceSpawnTrigger); TODO: fix this maybe and then uncomment
 
             // Initialize GUI Styles
             LABEL_STYLE_DEFAULT.fontSize = 16;
@@ -141,6 +123,7 @@ namespace SRSpeedrunHelper
             TEXT_STYLE_HEADER.fontStyle = FontStyle.Bold;
             TEXT_STYLE_HEADER.normal.textColor = Color.white;
 
+            // Timer setup
             gameTimer = gameObject.AddComponent<GameTimer>();
             TimerGUI.RegisterTimer(gameTimer);
 
@@ -171,7 +154,7 @@ namespace SRSpeedrunHelper
                 SetEnergyRecoverAfter(double.PositiveInfinity);
             }
 
-            if(showSpawners)
+            if(SpawnerGUI.showSpawners)
             {
                 // TODO: For efficiency, try hijacking the player's Raycast that's used to identify what Identifiable is being looked at
                 if (Physics.Raycast(Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0.0f)), out rayHit, 40.0f))
@@ -202,7 +185,7 @@ namespace SRSpeedrunHelper
             if(Levels.isMainMenu() || Levels.isSpecial())
             {
                 SpawnerInfoNode.ClearNodes();
-                showSpawners = false;
+                SpawnerGUI.showSpawners = false;
             }
         }
         #endregion
@@ -212,6 +195,7 @@ namespace SRSpeedrunHelper
         {
             // Modify GUI skin values
             // Have to do this in OnGUI for compatability with other mods (mainly SRCheatMenu)
+            // TODO: See if I can make this better, the style still changes some when SRCheatMenu is active
             GUI.skin.button.fontSize = 16;
             GUI.skin.button.fontStyle = FontStyle.Normal;
             GUI.skin.textField.fontSize = 16;
@@ -223,15 +207,17 @@ namespace SRSpeedrunHelper
             GUI.skin.window.fontSize = 16;
             GUI.skin.window.fontStyle = FontStyle.Bold;
 
+            // TODO: Change this so that some options are still available on main menu
             if (!Levels.isMainMenu() && !Levels.isSpecial())
             {
                 if(showMenu && IsGamePaused())
                 {
                     windowRect = GUILayout.Window(windowId, windowRect, ShowMenu, windowTitle);
                 }
-                if(showSpawners && targetSpawner != null)
+                // Seemingly can't create a window from within another window, so we need to create the spawner window here rather than in SpawnerGUI.DoGUI
+                if (SpawnerGUI.showSpawners && SRSpeedrunHelper.targetSpawner != null)
                 {
-                    spawnerWindowRect = GUILayout.Window(spawnerWindowId, spawnerWindowRect, ShowSpawnerMenu, spawnerWindowTitle);
+                    SpawnerGUI.DoSpawnerInfoGUI();
                 }
             }
             if(SRSHConfig.showModWarning && Levels.isMainMenu())
@@ -264,27 +250,7 @@ namespace SRSpeedrunHelper
                     break;
 
                 case (3):
-                    // Spawner view settings
-                    bool newShowSpawners = GUILayout.Toggle(showSpawners, "Show slime spawners");
-                    if(newShowSpawners != showSpawners)
-                    {
-                        if(newShowSpawners)
-                        {
-                            SpawnerInfoNode.ActivateNodes();
-                        }
-                        else
-                        {
-                            SpawnerInfoNode.DeactivateNodes();
-                        }
-                        showSpawners = newShowSpawners;
-                    }
-
-                    spawnerConvertToPercentage = GUILayout.Toggle(spawnerConvertToPercentage, "Show probabilities/weights in percentage rather than decimal");
-                    spawnerShowCountRange = GUILayout.Toggle(spawnerShowCountRange, "Show minimum and maximum amount of slimes spawned from this spawner");
-                    spawnerShowTriggerRate = GUILayout.Toggle(spawnerShowTriggerRate, "Show spawn chance of spawners once triggered");
-                    spawnerShowAvgNextSpawn = GUILayout.Toggle(spawnerShowAvgNextSpawn, "Show average amount of time until the next possible spawn after a trigger");
-                    spawnerShowNextSpawnTime = GUILayout.Toggle(spawnerShowNextSpawnTime, "Show the time that must be passed in order for this spawner to trigger");
-                    //spawnerShowNextSpawnTime = GUILayout.Toggle(spawnerShowNextSpawnTime, "Show the next time this spawner can be triggered"); requires reflection, stored in SpawnerTriggerModel
+                    SpawnerGUI.DoGUI();
                     break;
 
                 case (4): // Misc Settings
@@ -344,13 +310,15 @@ namespace SRSpeedrunHelper
                     }
 
                     // Spawn a crate in front of the player
+                    // TODO: yeah this is kind of irrelevant now. don't really want to remove it, but can something more useful be added instead?
                     if (GUILayout.Button("Spawn crate"))
                     {
                         SpawnCrate();
                     }
-
+                    /*
                     GUILayout.FlexibleSpace();
                     GUILayout.Label("More features to be added here in future versions. Taking requests on Discord!", LABEL_STYLE_BOLD);
+                    */
                     break;
 
                 default:
@@ -360,21 +328,10 @@ namespace SRSpeedrunHelper
 
             GUI.DragWindow();
         }
-
-        private void ShowSpawnerMenu(int winId)
-        {
-            if(winId != spawnerWindowId)
-            {
-                Log("Warning: Wrong window ID passed to ShowSpawnerMenu.");
-                return;
-            }
-
-            GUILayout.Label(targetSpawner.GetInfoText(), LABEL_STYLE_DEFAULT);
-        }
         #endregion
 
         #region Spawner Logic
-        void ForceSpawnTrigger()
+        internal void ForceSpawnTrigger()
         {
             targetSpawner?.ForceSpawn();
         }
@@ -463,11 +420,6 @@ namespace SRSpeedrunHelper
             }   
 
             return timeDirector.HasPauser();
-        }
-
-        internal static bool IsPauseMenuActive()
-        {
-            return PauseMenu.Instance.pauseUI.activeSelf;
         }
 
         internal static void ForceUnpause()
