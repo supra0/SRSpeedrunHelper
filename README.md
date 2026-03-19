@@ -5,7 +5,7 @@ Please note that under the rules of the Slime Rancher speedrunning leaderboard, 
 
 ## Features
 * Many pre-set warp locations.
-* Custom warp locations with the option to save your inventory (similar to save states).
+* Set custom warp locations with the option to save your inventory (similar to save states).
 * An in-game timer. Includes hotkeys for starting, pausing, and resetting.
 * Reset Gordos to their default state, or pop them instantly.
 * View detailed info on slime spawners.
