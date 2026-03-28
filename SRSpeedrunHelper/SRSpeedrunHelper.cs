@@ -129,6 +129,8 @@ namespace SRSpeedrunHelper
 
             // Pre-load custom user warps
             UserWarps.LoadWarps();
+
+            LayerMask.GetMask("Raycast Only");
         }
 
         public static void Pause(bool pause)
@@ -156,8 +158,8 @@ namespace SRSpeedrunHelper
 
             if(SpawnerGUI.showSpawners)
             {
-                // TODO: For efficiency, try hijacking the player's Raycast that's used to identify what Identifiable is being looked at
-                if (Physics.Raycast(Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0.0f)), out rayHit, 40.0f))
+                // TODO: Use RaycastNonAlloc
+                if (Physics.Raycast(Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0.0f)), out rayHit, 100.0f, SpawnerInfoNode.raycastOnlyMask))
                 {
                     SpawnerInfoNode temp = rayHit.collider.GetComponent<SpawnerInfoNode>();
                     if(temp != null)

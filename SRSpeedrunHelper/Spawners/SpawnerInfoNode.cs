@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using MonomiPark.SlimeRancher.DataModel;
 using UnityEngine;
@@ -7,6 +8,13 @@ namespace SRSpeedrunHelper.Spawners
 {
     class SpawnerInfoNode : MonoBehaviour
     {
+        public enum SlimeSpawnerType
+        {
+            None,
+            Triggered,
+            Directed
+        }
+
         private static List<SpawnerInfoNode> allSpawnerInfoNodes;
         private static readonly FieldInfo spawnerTriggerModelField = typeof(SpawnerTrigger).GetField("model", BindingFlags.NonPublic | BindingFlags.Instance);
 
@@ -18,25 +26,34 @@ namespace SRSpeedrunHelper.Spawners
         public DirectedActorSpawner Spawner { get; private set; }
         public SpawnerTrigger SpawnerTrigger { get; private set; }
         public CellDirector CellDirector { get; private set; }
+        public SlimeSpawnerType spawnerType = SlimeSpawnerType.None;
 
         private static readonly FieldInfo allCellDirectorsFieldInfo = typeof(CellDirector).GetField("allCellDirectors", BindingFlags.Static | BindingFlags.NonPublic);
         private static readonly FieldInfo spawnersFieldInfo = typeof(CellDirector).GetField("spawners", BindingFlags.Instance | BindingFlags.NonPublic);
         private static readonly FieldInfo partFieldInfo = typeof(SpawnerTriggerModel).GetField("part", BindingFlags.NonPublic | BindingFlags.Instance);
 
+        internal const string RAYCAST_LAYER_NAME = "RaycastOnly";
+        internal static readonly int raycastOnlyLayer = LayerMask.NameToLayer(RAYCAST_LAYER_NAME);
+        internal static readonly int raycastOnlyMask = LayerMask.GetMask(RAYCAST_LAYER_NAME);
+
         #region Instance Methods
         void Start()
         {
             transform.localScale = new Vector3(SPHERE_SCALE, SPHERE_SCALE, SPHERE_SCALE);
-            //GetComponent<Collider>().isTrigger = true; // Would like to have this be a trigger so that nothing collides with it, but then the Raycast only hits it when the player is also standing inside of the object?
             GetComponent<Renderer>().material.color = SPHERE_INACTIVE_COLOR;
+            /*
+            SRSpeedrunHelper.Log("Layer: " + gameObject.layer + " (" + LayerMask.LayerToName(gameObject.layer) + ")");
+            SRSpeedrunHelper.Log("raycastOnlyLayer: " + raycastOnlyLayer);
+            SRSpeedrunHelper.Log("raycastOnlyMask: " + raycastOnlyMask);
+            */
         }
 
         // TODO (OLD): Make this more efficient by only recalculating when necessary. Need to be able to tell when the spawner info display settings change and when a spawn has occurred
         // TODO 2026 UPDATE: ^ Good idea, but probably not the right approach. Future refactor maybe to have Options for each category (Gordo, Spawners, etc) as their own classes. i.e. the options for Spawner display would be like a SpawnerOptions class that can be passed into methods like this. Subclass of SpawnerGUI? not sure on exact implementation
         public string GetInfoText()
         {
-            // Show slimes and times
             string text = "";
+            text += "Spawner type: " + spawnerType.ToString() + "\n\n";
 
             //temp, whole method needs refactor that will happen as part of above TODO ^^^
             SpawnerTrigger st = SpawnerTrigger;
@@ -45,6 +62,7 @@ namespace SRSpeedrunHelper.Spawners
             foreach (DirectedActorSpawner.SpawnConstraint constraint in Spawner.constraints)
             {
                 string t = "";
+
                 DirectedActorSpawner.TimeMode timeMode = constraint.window.timeMode;
                 switch (timeMode)
                 {
@@ -80,7 +98,12 @@ namespace SRSpeedrunHelper.Spawners
 
                     if (SpawnerGUI.spawnerConvertToPercentage)
                     {
-                        text += ": " + slimeSet.weight / weightsSum * 100 + "%\n";
+                        double percentage = (double)(slimeSet.weight / weightsSum * 100);
+                        if(SpawnerGUI.spawnerRoundPercentage)
+                        {
+                            percentage = Math.Round(percentage, 2);
+                        }
+                        text += ": " + percentage + "%\n";
                     }
                     else
                     {
@@ -92,8 +115,8 @@ namespace SRSpeedrunHelper.Spawners
                 text += "\n";
             }
 
-            if(CellDirector != null)
-            {
+            if(spawnerType == SlimeSpawnerType.Directed)
+            { 
                 if (SpawnerGUI.spawnerShowCountRange)
                 {
                     text += "Spawn amount: " + cd.minPerSpawn + " - " + cd.maxPerSpawn + "\n\n";
@@ -102,11 +125,19 @@ namespace SRSpeedrunHelper.Spawners
                 text += "Cell info:\n";
                 text += "Name: " + cd.gameObject.name + "\n";
                 text += "Target Slime count: " + cd.targetSlimeCount + "\n";
-                text += "Max # of Slimes before culling: " + cd.cullSlimesLimit + "\n";
+                if(cd.cullSlimesLimit == int.MaxValue)
+                {
+                    text += "Max # of Slimes before culling: No Limit\n";
+                }
+                else
+                {
+                    text += "Max # of Slimes before culling: " + cd.cullSlimesLimit + "\n";
+                }
+
                 text += "avgSpawnTimeGameHours: " + cd.avgSpawnTimeGameHours + "\n";
             }
 
-            if(SpawnerTrigger != null)
+            if(spawnerType == SlimeSpawnerType.Triggered)
             {
                 if (SpawnerGUI.spawnerShowCountRange)
                 {
@@ -175,7 +206,7 @@ namespace SRSpeedrunHelper.Spawners
             float num = SpawnerTrigger.spawner is DirectedSlimeSpawner ? SRSingleton<SceneContext>.Instance.ModDirector.SlimeCountFactor() : 1f;
             SpawnerTrigger.StartCoroutine(SpawnerTrigger.spawner.Spawn(Mathf.RoundToInt(Randoms.SHARED.GetInRange(SpawnerTrigger.minSpawn, SpawnerTrigger.maxSpawn + 1) * num), Randoms.SHARED));
             */
-            }
+        }
 
         private void SetSpawner(DirectedActorSpawner spawner, SpawnerTrigger trigger = null, CellDirector cellDirector = null)
         {
@@ -241,8 +272,10 @@ namespace SRSpeedrunHelper.Spawners
                 foreach(DirectedActorSpawner spawner in spawners)
                 {
                     GameObject tmp = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    tmp.layer = raycastOnlyLayer;
                     SpawnerInfoNode infoNodeTmp = tmp.AddComponent<SpawnerInfoNode>();
 
+                    infoNodeTmp.spawnerType = SlimeSpawnerType.Directed;
                     infoNodeTmp.SetSpawner(spawner, null, cellDir);
                     allSpawnerInfoNodes.Add(infoNodeTmp);
                 }
@@ -253,9 +286,11 @@ namespace SRSpeedrunHelper.Spawners
             foreach (SpawnerTriggerModel model in spawnerTriggers)
             {
                 GameObject tmp = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                tmp.layer = raycastOnlyLayer;
                 SpawnerInfoNode infoNodeTmp = tmp.AddComponent<SpawnerInfoNode>();
                 SpawnerTrigger triggerTmp = (SpawnerTrigger)partFieldInfo.GetValue(model);
 
+                infoNodeTmp.spawnerType = SlimeSpawnerType.Triggered;
                 infoNodeTmp.SetSpawner(triggerTmp.spawner, triggerTmp);
                 allSpawnerInfoNodes.Add(infoNodeTmp);
             }

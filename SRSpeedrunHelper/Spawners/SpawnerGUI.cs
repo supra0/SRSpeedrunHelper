@@ -24,6 +24,7 @@ namespace SRSpeedrunHelper.Spawners
         public static bool spawnerShowNextSpawnTime = true;
         public static bool spawnerShowCountRange = true;
         public static bool spawnerConvertToPercentage = true;
+        public static bool spawnerRoundPercentage = true;
 
         internal static void DoGUI()
         {
@@ -41,12 +42,17 @@ namespace SRSpeedrunHelper.Spawners
                 showSpawners = newShowSpawners;
             }
 
-            spawnerConvertToPercentage = GUILayout.Toggle(spawnerConvertToPercentage, "Show probabilities/weights in percentage rather than decimal");
+            GUILayout.Label("\nInfo to Display", SRSpeedrunHelper.LABEL_STYLE_BOLD);
             spawnerShowCountRange = GUILayout.Toggle(spawnerShowCountRange, "Show minimum and maximum amount of slimes spawned from this spawner");
             spawnerShowTriggerRate = GUILayout.Toggle(spawnerShowTriggerRate, "Show spawn chance of spawners once triggered");
             spawnerShowAvgNextSpawn = GUILayout.Toggle(spawnerShowAvgNextSpawn, "Show average amount of time until the next possible spawn after a trigger");
             spawnerShowNextSpawnTime = GUILayout.Toggle(spawnerShowNextSpawnTime, "Show the time that must be passed in order for this spawner to trigger");
-            //spawnerShowNextSpawnTime = GUILayout.Toggle(spawnerShowNextSpawnTime, "Show the next time this spawner can be triggered"); requires reflection, stored in SpawnerTriggerModel
+
+            //GUILayout.FlexibleSpace();
+            GUILayout.Label("\nDisplay Options", SRSpeedrunHelper.LABEL_STYLE_BOLD);
+            spawnerConvertToPercentage = GUILayout.Toggle(spawnerConvertToPercentage, "Show spawn weights in percentage rather than decimal");
+            spawnerRoundPercentage = GUILayout.Toggle(spawnerRoundPercentage, "Round spawn percentages to 2 decimal places");
+
         }
         internal static void DoSpawnerInfoGUI()
         {
