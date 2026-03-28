@@ -33,6 +33,7 @@ namespace SRSpeedrunHelper
         // Ohter keybinds
         internal static KeyCode bind_spawnCrate;
         internal static KeyCode bind_forceSpawnTrigger;
+        internal static KeyCode bind_pinSpawner;
 
         // Other config variables
         internal static bool showModWarning = true;
@@ -66,30 +67,31 @@ namespace SRSpeedrunHelper
                     SRSpeedrunHelper.Log("Finished UMF Settings.");
 
                     // Show menu bind(s)
-                    bind_showMenu = cfg.Read("BindShowMenu", new UMFConfigKeyCode(KeyCode.BackQuote, true), "Toggles the SRSpeedrunHelper menu.");
+                    bind_showMenu = cfg.Read("BindShowMenu", new UMFConfigKeyCode(KeyCode.BackQuote, false), "Toggles the SRSpeedrunHelper menu.");
 
                     // User warp binds
-                    bind_userWarp1 = cfg.Read("BindSavestate1", new UMFConfigKeyCode(KeyCode.F1, true), "Runs the 1st custom warp.");
-                    bind_userWarp2 = cfg.Read("BindSavestate2", new UMFConfigKeyCode(KeyCode.F2, true), "Runs the 2nd custom warp.");
-                    bind_userWarp3 = cfg.Read("BindSavestate3", new UMFConfigKeyCode(KeyCode.F3, true), "Runs the 3rd custom warp.");
-                    bind_userWarp4 = cfg.Read("BindSavestate4", new UMFConfigKeyCode(KeyCode.F4, true), "Runs the 4th custom warp.");
-                    bind_userWarp5 = cfg.Read("BindSavestate5", new UMFConfigKeyCode(KeyCode.F5, true), "Runs the 5th custom warp.");
-                    bind_userWarp6 = cfg.Read("BindSavestate6", new UMFConfigKeyCode(KeyCode.F6, true), "Runs the 6th custom warp.");
-                    bind_userWarp7 = cfg.Read("BindSavestate7", new UMFConfigKeyCode(KeyCode.F7, true), "Runs the 7th custom warp.");
-                    bind_userWarp8 = cfg.Read("BindSavestate8", new UMFConfigKeyCode(KeyCode.F8, true), "Runs the 8th custom warp.");
-                    bind_userWarp9 = cfg.Read("BindSavestate9", new UMFConfigKeyCode(KeyCode.F9, true), "Runs the 9th custom warp.");
-                    bind_userWarp10 = cfg.Read("BindSavestate10", new UMFConfigKeyCode(KeyCode.F10, true), "Runs the 10th custom warp.");
-                    bind_userWarp11 = cfg.Read("BindSavestate11", new UMFConfigKeyCode(KeyCode.F11, true), "Runs the 11th custom warp.");
-                    bind_userWarp12 = cfg.Read("BindSavestate12", new UMFConfigKeyCode(KeyCode.F12, true), "Runs the 12th custom warp.");
+                    bind_userWarp1 = cfg.Read("BindSavestate1", new UMFConfigKeyCode(KeyCode.F1), "Runs the 1st custom warp.");
+                    bind_userWarp2 = cfg.Read("BindSavestate2", new UMFConfigKeyCode(KeyCode.F2), "Runs the 2nd custom warp.");
+                    bind_userWarp3 = cfg.Read("BindSavestate3", new UMFConfigKeyCode(KeyCode.F3), "Runs the 3rd custom warp.");
+                    bind_userWarp4 = cfg.Read("BindSavestate4", new UMFConfigKeyCode(KeyCode.F4), "Runs the 4th custom warp.");
+                    bind_userWarp5 = cfg.Read("BindSavestate5", new UMFConfigKeyCode(KeyCode.F5), "Runs the 5th custom warp.");
+                    bind_userWarp6 = cfg.Read("BindSavestate6", new UMFConfigKeyCode(KeyCode.F6), "Runs the 6th custom warp.");
+                    bind_userWarp7 = cfg.Read("BindSavestate7", new UMFConfigKeyCode(KeyCode.F7), "Runs the 7th custom warp.");
+                    bind_userWarp8 = cfg.Read("BindSavestate8", new UMFConfigKeyCode(KeyCode.F8), "Runs the 8th custom warp.");
+                    bind_userWarp9 = cfg.Read("BindSavestate9", new UMFConfigKeyCode(KeyCode.F9), "Runs the 9th custom warp.");
+                    bind_userWarp10 = cfg.Read("BindSavestate10", new UMFConfigKeyCode(KeyCode.F10), "Runs the 10th custom warp.");
+                    bind_userWarp11 = cfg.Read("BindSavestate11", new UMFConfigKeyCode(KeyCode.F11), "Runs the 11th custom warp.");
+                    bind_userWarp12 = cfg.Read("BindSavestate12", new UMFConfigKeyCode(KeyCode.F12), "Runs the 12th custom warp.");
 
                     // Timer binds
-                    bind_startTimer = cfg.Read("BindStartTimer", new UMFConfigKeyCode(KeyCode.Alpha0, true), "Start the mod's in-game timer.");
-                    bind_pauseTimer = cfg.Read("BindPauseTimer", new UMFConfigKeyCode(KeyCode.Minus, true), "Pause the mod's in-game timer.");
-                    bind_resetTimer = cfg.Read("BindResetTimer", new UMFConfigKeyCode(KeyCode.Equals, true), "Reset the mod's in-game timer.");
+                    bind_startTimer = cfg.Read("BindStartTimer", new UMFConfigKeyCode(KeyCode.Alpha0), "Start the mod's in-game timer.");
+                    bind_pauseTimer = cfg.Read("BindPauseTimer", new UMFConfigKeyCode(KeyCode.Minus), "Pause the mod's in-game timer.");
+                    bind_resetTimer = cfg.Read("BindResetTimer", new UMFConfigKeyCode(KeyCode.Equals), "Reset the mod's in-game timer.");
 
                     // Other keybinds
-                    bind_spawnCrate = cfg.Read("BindSpawnCrate", new UMFConfigKeyCode(KeyCode.None, true), "Spawns a crate in front of the player.");
-                    bind_forceSpawnTrigger = cfg.Read("BindForceSpawnTrigger", new UMFConfigKeyCode(KeyCode.P, true), "Activates the spawner being looked at.");
+                    bind_spawnCrate = cfg.Read("BindSpawnCrate", new UMFConfigKeyCode(KeyCode.None), "Spawns a crate in front of the player.");
+                    bind_forceSpawnTrigger = cfg.Read("BindForceSpawnTrigger", new UMFConfigKeyCode(KeyCode.P), "Activates the spawner being looked at.");
+                    bind_pinSpawner = cfg.Read("BindPinSpawner", new UMFConfigKeyCode(KeyCode.Z), "Pin the spawner that you're currently looking at. Press again to unpin.");
 
                     // Activate spawner bind(s)
                     //bind_activateSpawner = cfg.Read("BindActivateSpawner", new UMFConfigKeyCode(KeyCode.Equals), "Force trigger the spawner you are looking at.";

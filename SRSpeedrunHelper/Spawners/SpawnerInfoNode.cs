@@ -257,8 +257,6 @@ namespace SRSpeedrunHelper.Spawners
         {
             if(allSpawnerInfoNodes != null)
             {
-                // TODO: why is DestroyNodes commented out? guess there's not much point in destroying all of them just to recreate them?
-                //SRSpeedrunHelper.Log("Warning: Tried to create new spawner info nodes while they are already active. Call SpawnerInfoNode.DestroyNodes() first.");
                 SRSpeedrunHelper.Log("Warning: Tried to create new spawner info nodes while they are already active.");
                 return;
             }

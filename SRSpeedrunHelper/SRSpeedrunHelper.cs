@@ -49,8 +49,10 @@ namespace SRSpeedrunHelper
 
 
         #region Spawner Variables
-        private RaycastHit rayHit = new RaycastHit();
+        //private RaycastHit rayHit = new RaycastHit();
+        private RaycastHit[] rayHits = new RaycastHit[1]; //preallocated raycasthit array so we can use RaycastNonAlloc. not sure how beneficial this is, but probably worth doing since we're raycasting every frame
         internal static SpawnerInfoNode targetSpawner;
+        internal static bool pinSpawnerOn = false;
         #endregion
 
         #region GIF Recorder Variables
@@ -105,6 +107,7 @@ namespace SRSpeedrunHelper
             UMFGUI.RegisterBind("BindResetTimer", SRSHConfig.bind_resetTimer.ToString(), () => gameTimer.ResetTimer());
 
             UMFGUI.RegisterBind("BindSpawnCrate", SRSHConfig.bind_spawnCrate.ToString(), SpawnCrate);
+            UMFGUI.RegisterBind("BindPinSpawner", SRSHConfig.bind_pinSpawner.ToString(), ToggleSpawnerPin);
             //UMFGUI.RegisterBind("ForceSpawnTrigger", SRSHConfig.bind_forceSpawnTrigger.ToString(), ForceSpawnTrigger); TODO: fix this maybe and then uncomment
 
             // Initialize GUI Styles
@@ -129,8 +132,11 @@ namespace SRSpeedrunHelper
 
             // Pre-load custom user warps
             UserWarps.LoadWarps();
+        }
 
-            LayerMask.GetMask("Raycast Only");
+        internal static void RegisterOptions()
+        {
+
         }
 
         public static void Pause(bool pause)
@@ -156,12 +162,11 @@ namespace SRSpeedrunHelper
                 SetEnergyRecoverAfter(double.PositiveInfinity);
             }
 
-            if(SpawnerGUI.showSpawners)
+            if(!pinSpawnerOn && SpawnerGUI.showSpawners)
             {
-                // TODO: Use RaycastNonAlloc
-                if (Physics.Raycast(Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0.0f)), out rayHit, 100.0f, SpawnerInfoNode.raycastOnlyMask))
+                if (Physics.RaycastNonAlloc(Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0.0f)), rayHits, 100.0f, SpawnerInfoNode.raycastOnlyMask) > 0)
                 {
-                    SpawnerInfoNode temp = rayHit.collider.GetComponent<SpawnerInfoNode>();
+                    SpawnerInfoNode temp = rayHits[0].collider.GetComponent<SpawnerInfoNode>();
                     if(temp != null)
                     {
                         if(targetSpawner != temp)
@@ -186,6 +191,8 @@ namespace SRSpeedrunHelper
 
             if(Levels.isMainMenu() || Levels.isSpecial())
             {
+                pinSpawnerOn = false;
+                targetSpawner = null;
                 SpawnerInfoNode.ClearNodes();
                 SpawnerGUI.showSpawners = false;
             }
@@ -336,6 +343,18 @@ namespace SRSpeedrunHelper
         internal void ForceSpawnTrigger()
         {
             targetSpawner?.ForceSpawn();
+        }
+
+        internal void ToggleSpawnerPin()
+        {
+            if (!pinSpawnerOn && targetSpawner != null)
+            {
+                pinSpawnerOn = true;
+            }
+            else if(pinSpawnerOn)
+            {
+                pinSpawnerOn = false;
+            }
         }
         #endregion
 
