@@ -13,7 +13,7 @@ namespace SRSpeedrunHelper.Spawners
         private static readonly int spawnerWindowWidth = 300;
         private static readonly int spawnerWindowHeight = 450;
         private static readonly string spawnerWindowTitle = "Spawner Info";
-        private static readonly string spawnerWindowTitlePinned = " (Pinned)";
+        private static readonly string spawnerWindowTitlePinned = "Spawner Info (Pinned)";
         private static readonly int spawnerWindowId = 33734;
 
         private static Rect spawnerWindowRect = new Rect(Screen.width - spawnerWindowWidth, Screen.height - spawnerWindowHeight, spawnerWindowWidth, spawnerWindowHeight); // Bottom-right corner
@@ -53,15 +53,10 @@ namespace SRSpeedrunHelper.Spawners
             GUILayout.Label("\nDisplay Options", SRSpeedrunHelper.LABEL_STYLE_BOLD);
             spawnerConvertToPercentage = GUILayout.Toggle(spawnerConvertToPercentage, "Show spawn weights in percentage rather than decimal");
             spawnerRoundPercentage = GUILayout.Toggle(spawnerRoundPercentage, "Round spawn percentages to 2 decimal places");
-
         }
         internal static void DoSpawnerInfoGUI()
         {
-            string title = spawnerWindowTitle;
-            if(SRSpeedrunHelper.pinSpawnerOn)
-            {
-                title = String.Concat(title, spawnerWindowTitlePinned);
-            }
+            string title = SRSpeedrunHelper.pinSpawnerOn ? spawnerWindowTitlePinned : spawnerWindowTitle;
             spawnerWindowRect = GUILayout.Window(spawnerWindowId, spawnerWindowRect, SpawnerGUI.ShowSpawnerMenu, title);
         }
 

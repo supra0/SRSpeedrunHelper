@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Reflection;
 using MonomiPark.SlimeRancher.DataModel;
+using rail;
+using UModFramework.Extensions;
 using UnityEngine;
 
 namespace SRSpeedrunHelper.Spawners
@@ -18,15 +20,18 @@ namespace SRSpeedrunHelper.Spawners
         private static List<SpawnerInfoNode> allSpawnerInfoNodes;
         private static readonly FieldInfo spawnerTriggerModelField = typeof(SpawnerTrigger).GetField("model", BindingFlags.NonPublic | BindingFlags.Instance);
 
-        private static float SPHERE_SCALE = 2.0f;
-        private static float SPHERE_COLOR_ALPHA = 1.0f;
-        private static Color SPHERE_INACTIVE_COLOR = new Color(1.0f, 0.0f, 0.0f, SPHERE_COLOR_ALPHA);
-        private static Color SPHERE_ACTIVE_COLOR = new Color(0.0f, 1.0f, 0.0f, SPHERE_COLOR_ALPHA);
+        private const float SPAWNER_SPHERE_SCALE = 2.0f;
+        private static Color SPHERE_INACTIVE_COLOR = new Color(1.0f, 0.0f, 0.0f);
+        private static Color SPHERE_ACTIVE_COLOR = new Color(0.0f, 1.0f, 0.0f);
+
+        private static Color BOUNDS_COLOR = new Color(0.95f, 0.3f, 0.85f, 0.5f);
 
         public DirectedActorSpawner Spawner { get; private set; }
         public SpawnerTrigger SpawnerTrigger { get; private set; }
         public CellDirector CellDirector { get; private set; }
         public SlimeSpawnerType spawnerType = SlimeSpawnerType.None;
+
+        public GameObject TriggerBounds { get; private set; } = null;
 
         private static readonly FieldInfo allCellDirectorsFieldInfo = typeof(CellDirector).GetField("allCellDirectors", BindingFlags.Static | BindingFlags.NonPublic);
         private static readonly FieldInfo spawnersFieldInfo = typeof(CellDirector).GetField("spawners", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -36,11 +41,15 @@ namespace SRSpeedrunHelper.Spawners
         internal static readonly int raycastOnlyLayer = LayerMask.NameToLayer(RAYCAST_LAYER_NAME);
         internal static readonly int raycastOnlyMask = LayerMask.GetMask(RAYCAST_LAYER_NAME);
 
+        internal static readonly Shader boundsShader = Shader.Find("Legacy Shaders/Transparent/Diffuse");
+
         #region Instance Methods
         void Start()
         {
-            transform.localScale = new Vector3(SPHERE_SCALE, SPHERE_SCALE, SPHERE_SCALE);
-            GetComponent<Renderer>().material.color = SPHERE_INACTIVE_COLOR;
+            transform.localScale = new Vector3(SPAWNER_SPHERE_SCALE, SPAWNER_SPHERE_SCALE, SPAWNER_SPHERE_SCALE);
+            Renderer renderer = GetComponent<Renderer>();
+            renderer.material.color = SPHERE_INACTIVE_COLOR;
+            renderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
             /*
             SRSpeedrunHelper.Log("Layer: " + gameObject.layer + " (" + LayerMask.LayerToName(gameObject.layer) + ")");
             SRSpeedrunHelper.Log("raycastOnlyLayer: " + raycastOnlyLayer);
@@ -187,6 +196,7 @@ namespace SRSpeedrunHelper.Spawners
         public void SetIsBeingLookedAt(bool isBeingLookedAt)
         {
             GetComponent<Renderer>().material.color = isBeingLookedAt ? SPHERE_ACTIVE_COLOR : SPHERE_INACTIVE_COLOR;
+            SetBoundsVisibility(isBeingLookedAt);
         }
 
         // Spawn a single Slime
@@ -195,7 +205,7 @@ namespace SRSpeedrunHelper.Spawners
         {
             Spawner.Spawn(1, Randoms.SHARED);
 
-            /* Old version that respects the settings of the SpawnerTrigge
+            /* Old version that respects the settings of the SpawnerTrigger
             if(SpawnerTrigger == null)
             {
                 SRSpeedrunHelper.Log("ForceSpawn: The SpawnerTrigger we're trying to force a spawn on is null!");
@@ -220,6 +230,65 @@ namespace SRSpeedrunHelper.Spawners
             SpawnerTrigger = trigger;
             CellDirector = cellDirector;
             transform.position = spawner.transform.position;
+        }
+
+        // Sets the visibility of the trigger or cell director bounds (depending on spawner type)
+        public void SetBoundsVisibility(bool visible)
+        {
+            if(spawnerType == SlimeSpawnerType.Triggered)
+            {
+                SetTriggerVisibility(visible);
+            }
+            else if(spawnerType == SlimeSpawnerType.Directed)
+            {
+                SetCellBoundsVisibility(visible);
+            }
+        }
+
+        private void SetTriggerVisibility(bool visible)
+        {
+            SphereCollider triggerCollider = SpawnerTrigger.GetComponent<SphereCollider>();
+            if(triggerCollider == null)
+            {
+                SRSpeedrunHelper.Log("Warning: SpawnerTrigger found without a SphereCollider! Position: " + SpawnerTrigger.transform.position.ToString());
+            }
+
+            if (visible)
+            {
+                // if there's no bounds object already, we need to add one
+                if (TriggerBounds == null)
+                {
+                    GameObject tmp = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    tmp.RemoveComponent<SphereCollider>(); // Unity adds this for us but we don't want it >:(
+                    tmp.transform.position = SpawnerTrigger.transform.position;
+                    tmp.transform.localScale = SpawnerTrigger.transform.localScale * 2 * triggerCollider.radius; // match scale to trigger collider
+
+                    MeshRenderer renderer = tmp.GetComponent<MeshRenderer>();
+                    renderer.material.shader = boundsShader;
+                    renderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
+                    renderer.material.SetColor(boundsShader.GetPropertyNameId(0), BOUNDS_COLOR);
+
+                    tmp.transform.parent = gameObject.transform;
+                    TriggerBounds = tmp;
+                }
+                else
+                {
+                    TriggerBounds.GetComponent<Renderer>().enabled = true;
+                }
+            }
+            else
+            {
+                // no need to do anything if there's no bounds object
+                if(TriggerBounds != null)
+                {
+                    TriggerBounds.GetComponent<Renderer>().enabled = false;
+                }
+            }
+        }
+
+        private void SetCellBoundsVisibility(bool visible)
+        {
+            //TODO: This needs to be outside of this class. For each cell, create an object to display its mesh. Not sure exactly when to display (always? hash the cell name into a color somehow to differentiate them if needed?)
         }
         #endregion
 
